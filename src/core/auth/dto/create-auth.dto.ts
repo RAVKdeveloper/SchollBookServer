@@ -4,7 +4,7 @@ import { IsNotEmpty, IsEmail } from 'class-validator'
 import type { Roles } from 'src/basic/roles.type'
 
 export class CreateAuthDto {
-  @ApiProperty({ example: 'schoolbook:example.com', description: 'Email' })
+  @ApiProperty({ example: 'schoolbook@example.com', description: 'Email' })
   @IsEmail()
   readonly email: string
 

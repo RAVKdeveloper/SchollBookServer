@@ -10,9 +10,9 @@ import { UpdateAuthDto } from './dto/update-auth.dto'
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @Post('register')
   registr(@Body() dto: CreateAuthDto) {
-    return this.authService.create(dto)
+    return this.authService.register(dto)
   }
 
   @Get()

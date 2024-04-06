@@ -1,11 +1,21 @@
 import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+
+import { User } from '../user/entities/user.entity'
+import { JwtGenService } from '../jwt/jwt.service'
 import { CreateAuthDto } from './dto/create-auth.dto'
 import { UpdateAuthDto } from './dto/update-auth.dto'
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth'
+  constructor(
+    @InjectRepository(User) private userRepo: Repository<User>,
+    private readonly tokenService: JwtGenService,
+  ) {}
+
+  register(createAuthDto: CreateAuthDto) {
+    return createAuthDto
   }
 
   findAll() {
