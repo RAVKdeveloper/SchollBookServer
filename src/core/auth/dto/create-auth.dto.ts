@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsEmail } from 'class-validator'
+import { IsNotEmpty, IsEmail, MinLength, MaxLength } from 'class-validator'
 
 import type { Roles } from 'src/basic/roles.type'
 
@@ -23,4 +23,10 @@ export class CreateAuthDto {
   @ApiProperty({ example: 'STUDENT', description: 'Role user' })
   @IsNotEmpty()
   readonly role: Roles
+
+  @ApiProperty({ example: '12344566', description: 'Password' })
+  @IsNotEmpty()
+  @MinLength(6)
+  @MaxLength(70)
+  readonly password: string
 }

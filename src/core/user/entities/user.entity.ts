@@ -5,7 +5,7 @@ import { BasicEntity } from 'src/basic/basic.entity'
 
 import type { Roles } from 'src/basic/roles.type'
 
-Entity('user')
+@Entity('user')
 export class User extends BasicEntity {
   @ApiProperty({ example: 'Bill', description: 'User name' })
   @Column({ nullable: false })
@@ -28,7 +28,7 @@ export class User extends BasicEntity {
   password: string
 
   @ApiProperty({ example: 'https://schoolbook.com/default/avatar', description: 'User avatar' })
-  @Column({ nullable: false })
+  @Column({ nullable: false, default: 'https://schoolbook.com/default/avatar' })
   avatar: string
 
   @ApiProperty({
@@ -51,5 +51,5 @@ export class User extends BasicEntity {
     description: 'Blocked status',
   })
   @Column({ default: '' })
-  blockedDescription: boolean
+  blockedDescription: string
 }
