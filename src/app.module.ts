@@ -9,6 +9,8 @@ import { typeOrmConfig } from 'src/config/typeorm.config'
 
 import { AuthModule } from './core/auth/auth.module'
 import { UserModule } from './core/user/user.module'
+import { JwtGenService } from './core/jwt/jwt.service'
+import { MailService } from './core/mail/mail.service'
 
 @Module({
   imports: [
@@ -37,6 +39,6 @@ import { UserModule } from './core/user/user.module'
     UserModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [JwtGenService, MailService],
 })
 export class AppModule {}

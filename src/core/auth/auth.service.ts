@@ -2,9 +2,13 @@ import { ForbiddenException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import * as bcrypt from 'bcrypt'
+import { Response } from 'express'
 
 import { User } from '../user/entities/user.entity'
 import { JwtGenService } from '../jwt/jwt.service'
+import { MailService } from '../mail/mail.service'
+import { AuthCode } from './entities/authCode.entity'
+
 import { CreateAuthDto } from './dto/create-auth.dto'
 import { UpdateAuthDto } from './dto/update-auth.dto'
 
@@ -12,10 +16,12 @@ import { UpdateAuthDto } from './dto/update-auth.dto'
 export class AuthService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(AuthCode) private verifyCodeRepo: Repository<AuthCode>,
     private readonly tokenService: JwtGenService,
+    private readonly mailService: MailService,
   ) {}
 
-  async register(dto: CreateAuthDto) {
+  async register(dto: CreateAuthDto, res: Response) {
     const isEmptyUser = await this.userRepo.findOne({ where: { email: dto.email } })
 
     if (isEmptyUser) throw new ForbiddenException('Такой пользователь уже существует')
@@ -29,12 +35,24 @@ export class AuthService {
       password: hashPassword,
     })
 
+    const code = await this.createAuthCode({ ...user, password })
+
+    await this.mailService.sendAuthOneCod({ to: user.email, code })
+
     const acces_token = await this.tokenService.generateTokens({
       userId: user.id,
       userName: user.name,
     })
 
-    return { user, acces_token }
+    res.cookie('acces_token', acces_token, { httpOnly: true })
+
+    return user
+  }
+
+  async createAuthCode(user: User): Promise<number> {
+    const code = Math.floor(Math.random() * 10000)
+    const createCode = await this.verifyCodeRepo.save({ code, user })
+    return createCode.code
   }
 
   findAll() {

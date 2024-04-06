@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common'
+import { ApiTags, ApiCreatedResponse, ApiForbiddenResponse } from '@nestjs/swagger'
+import { Response } from 'express'
 
+import { User } from '../user/entities/user.entity'
 import { AuthService } from './auth.service'
 import { CreateAuthDto } from './dto/create-auth.dto'
 import { UpdateAuthDto } from './dto/update-auth.dto'
@@ -10,9 +12,14 @@ import { UpdateAuthDto } from './dto/update-auth.dto'
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiCreatedResponse({
+    description: 'User created',
+    type: User,
+  })
+  @ApiForbiddenResponse({ description: 'Пользователь с таким emаil уже существует' })
   @Post('register')
-  registr(@Body() dto: CreateAuthDto) {
-    return this.authService.register(dto)
+  registr(@Body() dto: CreateAuthDto, @Res({ passthrough: true }) res: Response) {
+    return this.authService.register(dto, res)
   }
 
   @Get()

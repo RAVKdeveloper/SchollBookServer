@@ -10,8 +10,9 @@ export class TypeOrmConfigClass {
       username: config.get('dblogin'),
       password: config.get('password'),
       database: config.get('namedb'),
-      entities: [__dirname + '/../**/*.entity{.js, .ts}'],
+      // entities: [__dirname + '/**/*.entity{.js,.ts}'],
       synchronize: true,
+      autoLoadEntities: true,
     }
   }
 }
