@@ -7,8 +7,8 @@ import { MailerModule } from '@nestjs-modules/mailer'
 import configuration from 'src/config/configuration'
 import { typeOrmConfig } from 'src/config/typeorm.config'
 
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
+import { AuthModule } from './core/auth/auth.module'
+import { UserModule } from './core/user/user.module'
 
 @Module({
   imports: [
@@ -33,8 +33,10 @@ import { AppService } from './app.service'
       },
     }),
     TypeOrmModule.forRootAsync(typeOrmConfig),
+    AuthModule,
+    UserModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

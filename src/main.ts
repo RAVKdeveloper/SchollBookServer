@@ -16,10 +16,11 @@ async function bootstrap() {
   app.use(cookieParser())
 
   const config = new DocumentBuilder()
-    .setTitle('Sber bank')
-    .setDescription('API Sberbank')
+    .setTitle('SchoolBook')
+    .setDescription('SchoolBook System Api')
     .setVersion('1.0')
-    .addTag('sberbank')
+    .addTag('schoolbook')
+    .addCookieAuth()
     .build()
 
   const document = SwaggerModule.createDocument(app, config)
