@@ -138,8 +138,6 @@ export class AuthService {
       where: { code, userId: { id: userId } },
     })
 
-    console.log(await this.verifyCodeRepo.find({ where: { userId: { id: userId } } }))
-
     if (!codeVer) throw new ForbiddenException('Неверный код доступа')
 
     await this.userRepo.update({ id: userId }, { isActivated: true })

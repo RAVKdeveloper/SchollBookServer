@@ -3,8 +3,6 @@ import { ApiProperty } from '@nestjs/swagger'
 
 import { BasicEntity } from 'src/basic/basic.entity'
 
-import type { Roles } from 'src/basic/roles.type'
-
 @Entity('user')
 export class User extends BasicEntity {
   @ApiProperty({ example: 'Bill', description: 'User name' })
@@ -30,13 +28,6 @@ export class User extends BasicEntity {
   @ApiProperty({ example: 'https://schoolbook.com/default/avatar', description: 'User avatar' })
   @Column({ nullable: false, default: 'https://schoolbook.com/default/avatar' })
   avatar: string
-
-  @ApiProperty({
-    example: 'OWNER',
-    description: 'User Role("OWNER" or "STUDENT" or "TEACHER" or "PARENT")',
-  })
-  @Column({ nullable: false })
-  role: Roles
 
   @ApiProperty({ example: false, description: 'Is active user account' })
   @Column({ default: false })

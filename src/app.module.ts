@@ -11,6 +11,9 @@ import { AuthModule } from './core/auth/auth.module'
 import { UserModule } from './core/user/user.module'
 import { JwtGenService } from './core/jwt/jwt.service'
 import { MailService } from './core/mail/mail.service'
+import { OwnerModule } from './core/accounts/owner/owner.module'
+import { StudentModule } from './core/accounts/student/student.module'
+import { TeacherModule } from './core/accounts/teacher/teacher.module'
 
 @Module({
   imports: [
@@ -37,6 +40,9 @@ import { MailService } from './core/mail/mail.service'
     TypeOrmModule.forRootAsync(typeOrmConfig),
     AuthModule,
     UserModule,
+    OwnerModule,
+    StudentModule,
+    TeacherModule,
   ],
   controllers: [],
   providers: [JwtGenService, MailService],
