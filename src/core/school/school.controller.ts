@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common'
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 
+import { OnlyOwnerGuard } from 'src/guards/owner.guard'
+import { AuthGuard } from 'src/guards/auth.guard'
 import { SchoolService } from './school.service'
 import { CreateSchoolDto } from './dto/create-school.dto'
 import { UpdateSchoolDto } from './dto/update-school.dto'
@@ -10,6 +12,8 @@ import { UpdateSchoolDto } from './dto/update-school.dto'
 export class SchoolController {
   constructor(private readonly schoolService: SchoolService) {}
 
+  @UseGuards(AuthGuard)
+  @UseGuards(OnlyOwnerGuard)
   @Post()
   create(@Body() createSchoolDto: CreateSchoolDto) {
     return this.schoolService.create(createSchoolDto)
