@@ -21,11 +21,11 @@ export class School extends BasicEntity {
   licenseNumber: string
 
   @ApiProperty({ example: 'https://schoolbook.ru/license?school=1', description: 'License image' })
-  @Column({ name: 'license_img' })
+  @Column({ name: 'license_img', nullable: true })
   licenseImg: string
 
-  @ApiProperty({ example: '1', description: 'Owner id' })
   @OneToOne(() => Owner, owner => owner.school)
+  @ApiProperty({ example: '1', description: 'Owner id', enum: () => Owner })
   @JoinColumn({ name: 'owner_id' })
   owner: Owner
 
@@ -37,13 +37,13 @@ export class School extends BasicEntity {
   @Column({ name: 'ip' })
   ip: string
 
-  @ApiProperty({ example: '[2, 3, 53, 332]', description: 'Students id' })
   @OneToMany(() => Student, student => student.school, { onDelete: 'CASCADE' })
+  @ApiProperty({ default: [], description: 'Students id', enum: () => Student })
   students: Student[]
 
-  @ApiProperty({ example: '[2, 3, 53, 332]', description: 'Teachers id' })
   @OneToMany(() => Teacher, teacher => teacher.school, { onDelete: 'CASCADE' })
-  teachers: Student[]
+  @ApiProperty({ default: [], description: 'Teachers id', enum: () => Teacher })
+  teachers: Teacher[]
 
   @ApiProperty({ example: 'Moscow', description: 'Region from this school' })
   @Column()

@@ -3,8 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { Owner } from './entities/owner.entity'
-// import { CreateOwnerDto } from './dto/create-owner.dto'
-import { UpdateOwnerDto } from './dto/update-owner.dto'
 
 @Injectable()
 export class OwnerService {
@@ -20,19 +18,7 @@ export class OwnerService {
     return await this.ownerRepo.save({ userId: { id: userId } })
   }
 
-  findAll() {
-    return 'This action returns all owner'
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} owner`
-  }
-
-  update(id: number, updateOwnerDto: UpdateOwnerDto) {
-    return `This action updates a #${id} ${updateOwnerDto}`
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} owner`
+  async remove(id: number) {
+    return await this.ownerRepo.delete({ id })
   }
 }

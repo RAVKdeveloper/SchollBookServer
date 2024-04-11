@@ -20,7 +20,7 @@ async function bootstrap() {
     .setDescription('SchoolBook System Api')
     .setVersion('1.0')
     .addTag('schoolbook')
-    .addCookieAuth()
+    .addCookieAuth('acces_token_auth')
     .build()
 
   const document = SwaggerModule.createDocument(app, config)
