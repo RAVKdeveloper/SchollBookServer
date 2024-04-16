@@ -3,12 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { User } from 'src/core/user/entities/user.entity'
 import { School } from 'src/core/school/entities/school.entity'
+import { Lesson } from 'src/core/lessons/entities/lesson.entity'
 import { Teacher } from './entities/teacher.entity'
 import { TeacherService } from './teacher.service'
 import { TeacherController } from './teacher.controller'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Teacher, School])],
+  imports: [TypeOrmModule.forFeature([User, Teacher, School, Lesson])],
   controllers: [TeacherController],
   providers: [TeacherService],
 })

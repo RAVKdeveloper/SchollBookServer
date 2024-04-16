@@ -15,6 +15,7 @@ import { OwnerModule } from './core/accounts/owner/owner.module'
 import { StudentModule } from './core/accounts/student/student.module'
 import { TeacherModule } from './core/accounts/teacher/teacher.module'
 import { SchoolModule } from './core/school/school.module'
+import { LessonsModule } from './core/lessons/lessons.module'
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { SchoolModule } from './core/school/school.module'
     StudentModule,
     TeacherModule,
     SchoolModule,
+    LessonsModule,
   ],
   controllers: [],
   providers: [JwtGenService, MailService],

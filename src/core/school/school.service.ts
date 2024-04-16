@@ -36,7 +36,7 @@ export class SchoolService {
   async findOne(id: number) {
     return await this.schoolRepo.findOne({
       where: { id },
-      relations: { owner: true, teachers: true },
+      relations: { owner: true, teachers: true, lessons: true },
     })
   }
 

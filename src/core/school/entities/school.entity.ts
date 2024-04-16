@@ -5,6 +5,7 @@ import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
 import { Student } from 'src/core/accounts/student/entities/student.entity'
 import { Owner } from 'src/core/accounts/owner/entities/owner.entity'
 import { BasicEntity } from 'src/basic/basic.entity'
+import { Lesson } from 'src/core/lessons/entities/lesson.entity'
 
 @Entity('school')
 export class School extends BasicEntity {
@@ -51,6 +52,11 @@ export class School extends BasicEntity {
   @OneToMany(() => Teacher, teacher => teacher.school, { onDelete: 'CASCADE' })
   @ApiProperty({ default: [], description: 'Teachers id', enum: () => Teacher })
   teachers: Teacher[]
+
+  @OneToMany(() => Lesson, lesson => lesson.school)
+  @ApiProperty({ default: [], enum: () => Lesson })
+  @JoinColumn()
+  lessons: Lesson[]
 
   @ApiProperty({ example: 'Moscow', description: 'Region from this school' })
   @Column()
