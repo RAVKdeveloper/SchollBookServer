@@ -13,7 +13,7 @@ export class SchoolService {
     @InjectRepository(Owner) private ownerRepo: Repository<Owner>,
   ) {}
 
-  async create(dto: CreateSchoolDto, userId: number) {
+  async create(dto: CreateSchoolDto, userId: number, ip: string) {
     const owner = await this.ownerRepo.findOne({ where: { userId: { id: userId }, school: null } })
 
     if (!owner) throw new NotFoundException('Пользователь не найден')
@@ -22,7 +22,7 @@ export class SchoolService {
 
     if (isEmpty) throw new ForbiddenException('Такая школа уже существует')
 
-    const newSchool = await this.schoolRepo.save({ ...dto, ip: '132.3535.345', owner: owner })
+    const newSchool = await this.schoolRepo.save({ ...dto, ip, owner: owner })
 
     return newSchool
   }
