@@ -1,1 +1,7 @@
-export type Roles = 'OWNER' | 'TEACHER' | 'STUDENT' | 'PARENT'
+export enum Roles {
+  'OWNER' = 'OWNER',
+  'TEACHER' = 'TEACHER',
+  'STUDENT' = 'STUDENT',
+  'PARENT' = 'PARENT',
+  'MODERATOR' = 'MODERATOR',
+}

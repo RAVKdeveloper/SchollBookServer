@@ -10,8 +10,10 @@ import {
 import { Response, Request } from 'express'
 
 import { AuthGuard } from 'src/guards/auth.guard'
+import { CustomHeaders } from 'src/basic/headers.type'
 import { User } from '../user/entities/user.entity'
 import { AuthService } from './auth.service'
+
 import { CreateAuthDto } from './dto/create-auth.dto'
 import { LoginAuthDto } from './dto/login-auth.dto'
 import { ForgotPassDto } from './dto/forgot-pass.dto'
@@ -53,7 +55,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('me')
   me(@Req() request: Request) {
-    return this.authService.me(request['user'].userId)
+    return this.authService.me(request[CustomHeaders.USER].userId)
   }
 
   @ApiOkResponse({ description: 'Возвращает пользователя', type: User })

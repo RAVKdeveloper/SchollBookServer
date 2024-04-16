@@ -12,7 +12,9 @@ import {
 import { ApiTags, ApiCreatedResponse, ApiOkResponse, ApiCookieAuth } from '@nestjs/swagger'
 import { CacheInterceptor } from '@nestjs/cache-manager'
 import type { Request } from 'express'
+import { CustomHeaders } from 'src/basic/headers.type'
 
+import { IpGuard } from 'src/guards/ip.guard'
 import { OnlyOwnerGuard } from 'src/guards/owner.guard'
 import { AuthGuard } from 'src/guards/auth.guard'
 import { School } from './entities/school.entity'
@@ -27,11 +29,12 @@ export class SchoolController {
 
   @ApiCreatedResponse({ description: 'School created', type: School })
   @ApiCookieAuth()
+  @UseGuards(IpGuard)
   @UseGuards(AuthGuard)
   @UseGuards(OnlyOwnerGuard)
   @Post()
   create(@Body() dto: CreateSchoolDto, @Req() req: Request) {
-    return this.schoolService.create(dto, req['user'].userId)
+    return this.schoolService.create(dto, req[CustomHeaders.USER].userId, req[CustomHeaders.IP])
   }
 
   @ApiOkResponse({
