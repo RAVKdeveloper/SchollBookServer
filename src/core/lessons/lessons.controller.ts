@@ -1,10 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common'
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+  Put,
+} from '@nestjs/common'
 import {
   ApiTags,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiCookieAuth,
   ApiOkResponse,
+  ApiNotFoundResponse,
 } from '@nestjs/swagger'
 
 import { AuthGuard } from 'src/guards/auth.guard'
@@ -15,6 +27,7 @@ import { LessonsService } from './lessons.service'
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { UpdateLessonDto } from './dto/update-lesson.dto'
 import { AddTeacherToLessonDto } from './dto/add-teacher.dto'
+import { RemoveTeacherInTheLessonDto } from './dto/remove-teacher.dto'
 
 @ApiTags('Lesson')
 @Controller('lessons')
@@ -32,6 +45,8 @@ export class LessonsController {
   }
 
   @ApiCreatedResponse({ description: 'Add teacher for lesson', type: Lesson })
+  @ApiNotFoundResponse({ description: 'Урок или учитель не найдены' })
+  @ApiForbiddenResponse({ description: 'Пользователь уже добавлен' })
   @ApiCookieAuth()
   @UseGuards(AuthGuard)
   @UseGuards(OnlyModeratorGuard)
@@ -62,6 +77,15 @@ export class LessonsController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto) {
     return this.lessonsService.update(+id, updateLessonDto)
+  }
+
+  @ApiOkResponse({ description: 'Update lesson', type: Lesson, isArray: true })
+  @UseGuards(AuthGuard)
+  @UseGuards(OnlyModeratorGuard)
+  @ApiCookieAuth()
+  @Put('teacher')
+  removeTeacher(@Body() dto: RemoveTeacherInTheLessonDto) {
+    return this.lessonsService.deleteTeacherForLessen(dto)
   }
 
   @UseGuards(AuthGuard)

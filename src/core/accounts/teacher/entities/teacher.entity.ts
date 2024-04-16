@@ -1,4 +1,4 @@
-import { Entity, Column, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
+import { Entity, Column, JoinColumn, ManyToOne, ManyToMany } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
 
 import { School } from 'src/core/school/entities/school.entity'
@@ -22,9 +22,8 @@ export class Teacher extends BasicEntity {
   @JoinColumn({ name: 'school_id' })
   school: School
 
-  @OneToMany(() => Lesson, lesson => lesson.teacher)
+  @ManyToMany(() => Lesson, lesson => lesson.teacher, { cascade: true })
   @ApiProperty({ default: [], enum: () => Lesson, description: 'Teacher lessons' })
-  @JoinColumn()
   lessons: Lesson[]
 
   @ApiProperty()
