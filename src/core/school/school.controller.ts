@@ -1,5 +1,16 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req } from '@nestjs/common'
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  UseInterceptors,
+} from '@nestjs/common'
 import { ApiTags, ApiCreatedResponse, ApiOkResponse, ApiCookieAuth } from '@nestjs/swagger'
+import { CacheInterceptor } from '@nestjs/cache-manager'
 import type { Request } from 'express'
 
 import { OnlyOwnerGuard } from 'src/guards/owner.guard'
@@ -9,6 +20,7 @@ import { SchoolService } from './school.service'
 import { CreateSchoolDto } from './dto/create-school.dto'
 
 @ApiTags('School')
+@UseInterceptors(CacheInterceptor)
 @Controller('school')
 export class SchoolController {
   constructor(private readonly schoolService: SchoolService) {}
