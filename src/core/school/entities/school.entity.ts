@@ -12,6 +12,13 @@ export class School extends BasicEntity {
   @Column()
   name: string
 
+  @ApiProperty({
+    example: 'https://schoolbook/schoolAvatars?school=62',
+    description: 'School name',
+  })
+  @Column({ nullable: true })
+  avatarUrl: string
+
   @ApiProperty({ example: 'st.Ukrainian h.65', description: 'School location' })
   @Column()
   location: string
