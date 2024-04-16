@@ -9,6 +9,7 @@ import {
   UseGuards,
   Query,
   Put,
+  UseInterceptors,
 } from '@nestjs/common'
 import {
   ApiTags,
@@ -18,6 +19,7 @@ import {
   ApiOkResponse,
   ApiNotFoundResponse,
 } from '@nestjs/swagger'
+import { CacheInterceptor } from '@nestjs/cache-manager'
 
 import { AuthGuard } from 'src/guards/auth.guard'
 import { OnlyModeratorGuard } from 'src/guards/moderator.guard'
@@ -30,6 +32,7 @@ import { AddTeacherToLessonDto } from './dto/add-teacher.dto'
 import { RemoveTeacherInTheLessonDto } from './dto/remove-teacher.dto'
 
 @ApiTags('Lesson')
+@UseInterceptors(CacheInterceptor)
 @Controller('lessons')
 export class LessonsController {
   constructor(private readonly lessonsService: LessonsService) {}

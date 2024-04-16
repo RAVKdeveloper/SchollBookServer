@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { JwtModule } from '@nestjs/jwt'
 import { MailerModule } from '@nestjs-modules/mailer'
+import { CacheModule } from '@nestjs/cache-manager'
+import { redisStore } from 'cache-manager-redis-yet'
 
 import configuration from 'src/config/configuration'
 import { typeOrmConfig } from 'src/config/typeorm.config'
@@ -22,6 +24,7 @@ import { LessonsModule } from './core/lessons/lessons.module'
     ConfigModule.forRoot({
       envFilePath: '.env',
       load: [configuration],
+      isGlobal: true,
     }),
     JwtModule.register({
       global: true,
@@ -40,6 +43,20 @@ import { LessonsModule } from './core/lessons/lessons.module'
       },
     }),
     TypeOrmModule.forRootAsync(typeOrmConfig),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory: async config => {
+        const store = await redisStore({
+          socket: {
+            host: config.get('redis.host'),
+            port: config.get('redis.port'),
+          },
+        })
+        return { store }
+      },
+      inject: [ConfigService],
+    }),
     AuthModule,
     UserModule,
     OwnerModule,

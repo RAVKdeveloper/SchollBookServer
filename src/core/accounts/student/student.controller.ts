@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common'
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { CacheInterceptor } from '@nestjs/cache-manager'
 
 import { StudentService } from './student.service'
 import { CreateStudentDto } from './dto/create-student.dto'
 import { UpdateStudentDto } from './dto/update-student.dto'
 
 @ApiTags('Student')
+@UseInterceptors(CacheInterceptor)
 @Controller('student')
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
