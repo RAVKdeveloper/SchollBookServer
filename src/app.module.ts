@@ -18,6 +18,7 @@ import { StudentModule } from './core/accounts/student/student.module'
 import { TeacherModule } from './core/accounts/teacher/teacher.module'
 import { SchoolModule } from './core/school/school.module'
 import { LessonsModule } from './core/lessons/lessons.module'
+import { ClassModule } from './core/class/class.module'
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { LessonsModule } from './core/lessons/lessons.module'
     TeacherModule,
     SchoolModule,
     LessonsModule,
+    ClassModule,
   ],
   controllers: [],
   providers: [JwtGenService, MailService],

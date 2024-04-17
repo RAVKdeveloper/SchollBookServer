@@ -5,6 +5,7 @@ import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
 import { Student } from 'src/core/accounts/student/entities/student.entity'
 import { Owner } from 'src/core/accounts/owner/entities/owner.entity'
 import { BasicEntity } from 'src/basic/basic.entity'
+import { Class } from 'src/core/class/entities/class.entity'
 import { Lesson } from 'src/core/lessons/entities/lesson.entity'
 
 @Entity('school')
@@ -57,6 +58,11 @@ export class School extends BasicEntity {
   @ApiProperty({ default: [], enum: () => Lesson })
   @JoinColumn()
   lessons: Lesson[]
+
+  @OneToMany(() => Class, classe => classe.school)
+  @ApiProperty({ default: [], enum: () => Class })
+  @JoinColumn()
+  classes: Class[]
 
   @ApiProperty({ example: 'Moscow', description: 'Region from this school' })
   @Column()

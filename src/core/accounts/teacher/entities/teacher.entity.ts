@@ -4,6 +4,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { School } from 'src/core/school/entities/school.entity'
 import { User } from 'src/core/user/entities/user.entity'
 import { Lesson } from 'src/core/lessons/entities/lesson.entity'
+import { Class } from 'src/core/class/entities/class.entity'
 import { BasicEntity } from 'src/basic/basic.entity'
 
 @Entity('teacher_account')
@@ -30,4 +31,8 @@ export class Teacher extends BasicEntity {
   @ApiProperty({ example: '7:30 - 17:00', description: 'Opening times' })
   @Column({ name: 'opening_times' })
   OpeningTimes: string
+
+  @ApiProperty({ default: [], description: 'Chief to class' })
+  @ManyToMany(() => Class, classe => classe.chiefs, { nullable: true })
+  class: Class[]
 }
