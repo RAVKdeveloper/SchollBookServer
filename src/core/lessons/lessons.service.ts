@@ -26,7 +26,10 @@ export class LessonsService {
   }
 
   findAll(id: number) {
-    return this.lessonRepo.find({ where: { school: { id } }, relations: { teacher: true } })
+    return this.lessonRepo.find({
+      where: { school: { id } },
+      relations: { teacher: true, classes: true },
+    })
   }
 
   findOne(id: number) {

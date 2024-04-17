@@ -4,6 +4,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { BasicEntity } from 'src/basic/basic.entity'
 import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
 import { School } from 'src/core/school/entities/school.entity'
+import { Class } from 'src/core/class/entities/class.entity'
 
 @Entity('lesson')
 export class Lesson extends BasicEntity {
@@ -27,4 +28,8 @@ export class Lesson extends BasicEntity {
   @ApiProperty({ enum: () => Teacher, description: 'Teacher' })
   @JoinTable()
   teacher: Teacher[]
+
+  @ManyToMany(() => Class, classe => classe.lessons)
+  @ApiProperty({ enum: () => Class, description: 'Classes' })
+  classes: Class[]
 }
