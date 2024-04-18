@@ -1,7 +1,8 @@
-import { Entity, Column, JoinColumn, ManyToOne } from 'typeorm'
+import { Entity, Column, JoinColumn, ManyToOne, ManyToMany } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
 
 import { School } from 'src/core/school/entities/school.entity'
+import { Class } from 'src/core/class/entities/class.entity'
 import { User } from 'src/core/user/entities/user.entity'
 import { BasicEntity } from 'src/basic/basic.entity'
 
@@ -16,10 +17,15 @@ export class Student extends BasicEntity {
   @Column({ default: false, nullable: false })
   isAdmit: boolean
 
-  @ApiProperty({ example: '62', description: 'School id' })
+  @ApiProperty({ example: '62', description: 'School id', enum: () => School })
   @ManyToOne(() => School, school => school.students)
   @JoinColumn({ name: 'school_id' })
   school: School
+
+  @ManyToMany(() => Class, classe => classe.students)
+  @ApiProperty({ default: [], description: 'Class student', enum: () => Class })
+  @JoinColumn({ name: 'class' })
+  class: Class[]
 
   @ApiProperty({
     example: '2024-03-02T11:18:30.993Z',

@@ -54,8 +54,10 @@ import { ClassModule } from './core/class/class.module'
             host: config.get('redis.host'),
             port: config.get('redis.port'),
           },
+          ttl: 10000,
         })
-        return { store }
+
+        return { store, ttl: 10000 }
       },
       inject: [ConfigService],
     }),
