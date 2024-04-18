@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { MailerModule } from '@nestjs-modules/mailer'
 import { CacheModule } from '@nestjs/cache-manager'
 import { redisStore } from 'cache-manager-redis-yet'
+import { ScheduleModule } from '@nestjs/schedule'
 
 import configuration from 'src/config/configuration'
 import { typeOrmConfig } from 'src/config/typeorm.config'
@@ -58,6 +59,7 @@ import { ClassModule } from './core/class/class.module'
       },
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
     OwnerModule,
