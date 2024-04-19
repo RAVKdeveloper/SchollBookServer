@@ -1,47 +1,58 @@
-import { Injectable, Inject } from '@nestjs/common'
-import { Cache } from 'cache-manager'
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
+import { Student } from './entities/student.entity'
 import { CreateStudentDto } from './dto/create-student.dto'
 import { UpdateStudentDto } from './dto/update-student.dto'
 
 @Injectable()
 export class StudentService {
-  constructor(@Inject('CACHE_MANAGER') private cacheManager: Cache) {}
+  cacheKey: string = '/api/student'
 
-  async create(dto: CreateStudentDto) {
-    const cache = await this.cacheManager.get('students')
-    if (!cache) {
-      const students = await this.test()
-      await this.cacheManager.set('students', { ...students, ...dto })
-      return { ...students, ...dto }
-    }
+  constructor(@InjectRepository(Student) private studentRepo: Repository<Student>) {}
 
-    return cache
-  }
-
-  async test(): Promise<{ student: string }> {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        const students = { student: 'Hello' }
-
-        resolve(students)
-      }, 1000)
+  async create(dto: CreateStudentDto, userId: number) {
+    return await this.studentRepo.save({
+      school: { id: dto.schoolId },
+      userId: { id: userId },
     })
   }
 
-  findAll() {
-    return 'This action returns all student'
+  async findAll(schoolId: number) {
+    return await this.studentRepo.find({
+      where: { school: { id: schoolId } },
+      relations: {
+        userId: true,
+      },
+    })
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} student`
+  async findOne(id: number) {
+    const student = await this.studentRepo.findOne({
+      where: { id },
+      relations: {
+        userId: true,
+        class: {
+          chiefs: {
+            userId: true,
+          },
+          lessons: true,
+        },
+        school: true,
+      },
+    })
+
+    if (!student) throw new NotFoundException('Пользователь не найден')
+
+    return student
   }
 
   update(id: number, dto: UpdateStudentDto) {
     return `This action updates a #${id} ${dto} student`
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} student`
+  remove(id: number, userId: number) {
+    return this.studentRepo.delete({ id, userId: { id: userId } })
   }
 }

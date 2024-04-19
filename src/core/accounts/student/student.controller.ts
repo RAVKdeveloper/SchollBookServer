@@ -1,27 +1,55 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UseGuards,
+  Req,
+  Query,
+} from '@nestjs/common'
+import {
+  ApiTags,
+  ApiCreatedResponse,
+  ApiCookieAuth,
+  ApiOkResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger'
 import { CacheInterceptor } from '@nestjs/cache-manager'
+import type { Request } from 'express'
 
+import { CustomHeaders } from 'src/basic/headers.type'
+import { AuthGuard } from 'src/guards/auth.guard'
+import { Student } from './entities/student.entity'
 import { StudentService } from './student.service'
 import { CreateStudentDto } from './dto/create-student.dto'
 import { UpdateStudentDto } from './dto/update-student.dto'
 
 @ApiTags('Student')
+@ApiCookieAuth()
 @UseInterceptors(CacheInterceptor)
+@UseGuards(AuthGuard)
 @Controller('student')
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
+  @ApiCreatedResponse({ description: 'Create student', type: Student })
   @Post()
-  create(@Body() createStudentDto: CreateStudentDto) {
-    return this.studentService.create(createStudentDto)
+  create(@Body() dto: CreateStudentDto, @Req() req: Request) {
+    return this.studentService.create(dto, req[CustomHeaders.USER].userId)
   }
 
+  @ApiOkResponse({ description: 'All students for school', type: Student, isArray: true })
   @Get()
-  findAll() {
-    return this.studentService.findAll()
+  findAll(@Query('school') id: string) {
+    return this.studentService.findAll(+id)
   }
 
+  @ApiOkResponse({ description: 'Get user', type: Student })
+  @ApiNotFoundResponse({ description: 'Пользователь не найден' })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.studentService.findOne(+id)
@@ -33,7 +61,7 @@ export class StudentController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.studentService.remove(+id)
+  remove(@Param('id') id: string, @Req() req: Request) {
+    return this.studentService.remove(+id, req[CustomHeaders.USER].userId)
   }
 }
