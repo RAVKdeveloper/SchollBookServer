@@ -39,8 +39,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./postgresql.conf:/etc/postgresql.conf
-      - ./pg-data:/var/lib/postgresql/data
+      - /var/lib/postgresql/data
 volumes:
   redis:
     driver: local
