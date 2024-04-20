@@ -17,6 +17,7 @@ import { RemoveChiefClassDto } from './dto/remove-cheif.dto'
 import { AddStudentDto } from './dto/add-student.dto'
 import { RemoveStudentDto } from './dto/remove-student.dto'
 import { AddLessonToClassDto } from './dto/add-lesson.dto'
+import { RemoveLessonToClassDto } from './dto/remove-lesson.dto'
 
 @Injectable()
 export class ClassService {
@@ -202,6 +203,23 @@ export class ClassService {
     await this.cahceManager.del(cacheKey)
 
     return await this.classRepo.save(clas)
+  }
+
+  async removeLesson(dto: RemoveLessonToClassDto) {
+    const clas = await this.classRepo.findOne({
+      where: { id: dto.classId },
+      relations: { lessons: true },
+    })
+
+    if (!clas) throw new NotFoundException('Класс не найден')
+
+    const updateLessons = clas.lessons.filter(lesson => lesson.id !== dto.lessonId)
+
+    const cacheKey = `${this.chacheKey}${dto.classId}`
+
+    await this.cahceManager.del(cacheKey)
+
+    return await this.classRepo.save({ ...clas, lessons: updateLessons })
   }
 
   async update(id: number, dto: UpdateClassDto) {

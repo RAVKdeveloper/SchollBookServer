@@ -35,6 +35,7 @@ import { RemoveChiefClassDto } from './dto/remove-cheif.dto'
 import { AddStudentDto } from './dto/add-student.dto'
 import { RemoveStudentDto } from './dto/remove-student.dto'
 import { AddLessonToClassDto } from './dto/add-lesson.dto'
+import { RemoveLessonToClassDto } from './dto/remove-lesson.dto'
 
 @ApiTags('Class')
 @ApiCookieAuth()
@@ -99,6 +100,14 @@ export class ClassController {
   @Put('lesson')
   addLesson(@Body() dto: AddLessonToClassDto) {
     return this.classService.addLesson(dto)
+  }
+
+  @ApiCreatedResponse({ description: 'Remove lesson', type: Class })
+  @ApiNotFoundResponse({ description: 'Класс не найден' })
+  // @UseGuards(OnlyModeratorGuard)
+  @Put('remove-lesson')
+  removeLesson(@Body() dto: RemoveLessonToClassDto) {
+    return this.classService.removeLesson(dto)
   }
 
   @ApiOkResponse({ description: 'All classes for school', isArray: true, type: Class })
