@@ -81,7 +81,7 @@ export class AuthService {
   }
 
   async createAuthCode(user: User): Promise<number> {
-    const code = Math.floor(Math.random() * 10000)
+    const code = Math.ceil(Math.random() * 10000)
     const createCode = await this.verifyCodeRepo.save({ code, userId: user })
     return createCode.code
   }

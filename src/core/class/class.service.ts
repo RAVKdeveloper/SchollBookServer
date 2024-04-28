@@ -75,7 +75,7 @@ export class ClassService {
   }
 
   async findOne(id: number) {
-    return await this.classRepo.findOne({
+    const clas = await this.classRepo.findOne({
       where: { id },
       relations: {
         lessons: {
@@ -92,6 +92,14 @@ export class ClassService {
       },
       cache: true,
     })
+
+    if (!clas) throw new NotFoundException('Класс не найден')
+
+    const newStudents = clas.students.filter(({ isAdmit }) => isAdmit === true)
+
+    clas.students = newStudents
+
+    return clas
   }
 
   // Remove and add chiefs
