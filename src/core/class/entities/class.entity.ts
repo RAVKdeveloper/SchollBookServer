@@ -7,6 +7,7 @@ import { Lesson } from 'src/core/lessons/entities/lesson.entity'
 import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
 import { Student } from 'src/core/accounts/student/entities/student.entity'
 import { Point } from 'src/core/point-system/entities/point-system.entity'
+import { ClassSchedule } from 'src/core/class-schedule/entities/class-schedule.entity'
 
 @Entity('class')
 export class Class extends BasicEntity {
@@ -41,4 +42,9 @@ export class Class extends BasicEntity {
   @OneToMany(() => Point, point => point.classe)
   @ApiProperty({ description: 'Points', enum: () => Point })
   points: Point[]
+
+  @OneToMany(() => ClassSchedule, schedule => schedule.class)
+  @ApiProperty({ description: 'Schedule', enum: () => ClassSchedule })
+  @JoinColumn()
+  schedule: ClassSchedule[]
 }
