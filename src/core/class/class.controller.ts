@@ -104,7 +104,7 @@ export class ClassController {
 
   @ApiCreatedResponse({ description: 'Remove lesson', type: Class })
   @ApiNotFoundResponse({ description: 'Класс не найден' })
-  // @UseGuards(OnlyModeratorGuard)
+  @UseGuards(OnlyModeratorGuard)
   @Put('remove-lesson')
   removeLesson(@Body() dto: RemoveLessonToClassDto) {
     return this.classService.removeLesson(dto)

@@ -49,7 +49,7 @@ export class StudentService {
   }
 
   update(id: number, dto: UpdateStudentDto) {
-    return `This action updates a #${id} ${dto} student`
+    return this.studentRepo.update({ id }, { isAdmit: dto.isAdmit })
   }
 
   remove(id: number, userId: number) {

@@ -21,6 +21,7 @@ import { SchoolModule } from './core/school/school.module'
 import { LessonsModule } from './core/lessons/lessons.module'
 import { ClassModule } from './core/class/class.module'
 import { PointSystemModule } from './core/point-system/point-system.module'
+import { ClassScheduleModule } from './core/class-schedule/class-schedule.module'
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { PointSystemModule } from './core/point-system/point-system.module'
     LessonsModule,
     ClassModule,
     PointSystemModule,
+    ClassScheduleModule,
   ],
   controllers: [],
   providers: [JwtGenService, MailService],
