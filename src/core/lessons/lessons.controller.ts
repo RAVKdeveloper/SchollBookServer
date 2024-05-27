@@ -1,35 +1,35 @@
+import { CacheInterceptor } from '@nestjs/cache-manager'
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
-  Query,
+  Get,
+  Param,
+  Patch,
+  Post,
   Put,
+  Query,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
 import {
-  ApiTags,
+  ApiCookieAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
-  ApiCookieAuth,
-  ApiOkResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger'
-import { CacheInterceptor } from '@nestjs/cache-manager'
 
 import { AuthGuard } from 'src/guards/auth.guard'
 import { OnlyModeratorGuard } from 'src/guards/moderator.guard'
 
+import { AddTeacherToLessonDto } from './dto/add-teacher.dto'
+import { CreateLessonDto } from './dto/create-lesson.dto'
+import { RemoveTeacherInTheLessonDto } from './dto/remove-teacher.dto'
+import { UpdateLessonDto } from './dto/update-lesson.dto'
 import { Lesson } from './entities/lesson.entity'
 import { LessonsService } from './lessons.service'
-import { CreateLessonDto } from './dto/create-lesson.dto'
-import { UpdateLessonDto } from './dto/update-lesson.dto'
-import { AddTeacherToLessonDto } from './dto/add-teacher.dto'
-import { RemoveTeacherInTheLessonDto } from './dto/remove-teacher.dto'
 
 @ApiTags('Lesson')
 @UseInterceptors(CacheInterceptor)

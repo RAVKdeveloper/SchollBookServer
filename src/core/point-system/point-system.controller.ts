@@ -1,32 +1,32 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-  UseInterceptors,
-  UseGuards,
-} from '@nestjs/common'
 import { CacheInterceptor } from '@nestjs/cache-manager'
 import {
-  ApiTags,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common'
+import {
   ApiCookieAuth,
   ApiCreatedResponse,
-  ApiOkResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger'
 
 import { AuthGuard } from 'src/guards/auth.guard'
 import { OnlyTeacherGuard } from 'src/guards/teacher.guard'
 
+import { CreatePointSystemDto } from './dto/create-point-system.dto'
+import { FindAllClassPointsDto } from './dto/find-all-class.dto'
+import { UpdatePointSystemDto } from './dto/update-point-system.dto'
 import { Point } from './entities/point-system.entity'
 import { PointSystemService } from './point-system.service'
-import { CreatePointSystemDto } from './dto/create-point-system.dto'
-import { UpdatePointSystemDto } from './dto/update-point-system.dto'
-import { FindAllClassPointsDto } from './dto/find-all-class.dto'
 
 @ApiTags('Point-system')
 @ApiCookieAuth()
@@ -36,7 +36,7 @@ import { FindAllClassPointsDto } from './dto/find-all-class.dto'
 export class PointSystemController {
   constructor(private readonly pointSystemService: PointSystemService) {}
 
-  @UseGuards(OnlyTeacherGuard)
+  // @UseGuards(OnlyTeacherGuard)
   @ApiCreatedResponse({ description: 'Create point', type: Point })
   @Post()
   create(@Body() createPointSystemDto: CreatePointSystemDto) {

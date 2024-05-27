@@ -1,10 +1,10 @@
-import { Entity, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm'
 
 import { BasicEntity } from 'src/basic/basic.entity'
 import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
-import { School } from 'src/core/school/entities/school.entity'
 import { Class } from 'src/core/class/entities/class.entity'
+import { School } from 'src/core/school/entities/school.entity'
 
 @Entity('lesson')
 export class Lesson extends BasicEntity {
@@ -29,7 +29,7 @@ export class Lesson extends BasicEntity {
   @JoinTable()
   teacher: Teacher[]
 
-  @ManyToMany(() => Class, classe => classe.lessons)
+  @ManyToOne(() => Class, classe => classe.lessons, { onDelete: 'CASCADE' })
   @ApiProperty({ enum: () => Class, description: 'Classes' })
-  classes: Class[]
+  classes: Class
 }

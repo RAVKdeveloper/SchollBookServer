@@ -1,27 +1,28 @@
-import { Module } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { JwtModule } from '@nestjs/jwt'
 import { MailerModule } from '@nestjs-modules/mailer'
 import { CacheModule } from '@nestjs/cache-manager'
-import { redisStore } from 'cache-manager-redis-yet'
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { JwtModule } from '@nestjs/jwt'
 import { ScheduleModule } from '@nestjs/schedule'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { redisStore } from 'cache-manager-redis-yet'
 
 import configuration from 'src/config/configuration'
 import { typeOrmConfig } from 'src/config/typeorm.config'
 
-import { AuthModule } from './core/auth/auth.module'
-import { UserModule } from './core/user/user.module'
-import { JwtGenService } from './core/jwt/jwt.service'
-import { MailService } from './core/mail/mail.service'
 import { OwnerModule } from './core/accounts/owner/owner.module'
 import { StudentModule } from './core/accounts/student/student.module'
 import { TeacherModule } from './core/accounts/teacher/teacher.module'
-import { SchoolModule } from './core/school/school.module'
-import { LessonsModule } from './core/lessons/lessons.module'
-import { ClassModule } from './core/class/class.module'
-import { PointSystemModule } from './core/point-system/point-system.module'
+import { AuthModule } from './core/auth/auth.module'
 import { ClassScheduleModule } from './core/class-schedule/class-schedule.module'
+import { ClassModule } from './core/class/class.module'
+import { JwtGenService } from './core/jwt/jwt.service'
+import { LessonsModule } from './core/lessons/lessons.module'
+import { MailService } from './core/mail/mail.service'
+import { PointSystemModule } from './core/point-system/point-system.module'
+import { SchoolModule } from './core/school/school.module'
+import { SheduleActionsModule } from './core/shedule-actions/shedule-actions.module'
+import { UserModule } from './core/user/user.module'
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { ClassScheduleModule } from './core/class-schedule/class-schedule.module
     ClassModule,
     PointSystemModule,
     ClassScheduleModule,
+    SheduleActionsModule,
   ],
   controllers: [],
   providers: [JwtGenService, MailService],

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
@@ -8,9 +8,10 @@ import { Lesson } from '../lessons/entities/lesson.entity'
 import { ClassSchedule } from './entities/class-schedule.entity'
 import { DaySchedule } from './entities/day-schedule.entity'
 
+import { CheckIsEmptySchedule } from './dto/check-isempty-schedule.dto'
 import { CreateClassScheduleDto } from './dto/create-class-schedule.dto'
-import { UpdateClassScheduleDto } from './dto/update-class-schedule.dto'
 import { CreateDaySchedulerDto } from './dto/create-day-scheduler.dto'
+import { RemoveDayInScheduleDto } from './dto/remove-day.dto'
 
 @Injectable()
 export class ClassScheduleService {
@@ -23,23 +24,39 @@ export class ClassScheduleService {
 
   async create(dto: CreateClassScheduleDto) {
     const date = this.getDate()
+
+    await this.checkIsEmptySchedule({
+      classId: dto.classId,
+      currentWeek: date.week,
+      currentYear: date.year,
+    })
+
     const newSchedule = await this.scheduleRepo.save({
       class: { id: dto.classId },
       currentWeek: date.week,
       year: date.year,
+      timelineStart: date.timelineStart,
+      timelineEnd: date.timelineEnd,
     })
 
-    if (!dto.day) return newSchedule
+    if (dto.days.length === 0) return newSchedule
 
-    await this.createDayScheduler({ day: { ...dto.day }, schedulerId: newSchedule.id })
+    Promise.all(
+      dto.days.map(async day => {
+        await this.createDayScheduler({ ...day, schedulerId: newSchedule.id })
+      }),
+    )
 
     return newSchedule
   }
 
-  findAll() {
+  findAll(classId: number) {
     return this.scheduleRepo.find({
       relations: {
         days: true,
+      },
+      where: {
+        class: { id: classId },
       },
     })
   }
@@ -71,23 +88,28 @@ export class ClassScheduleService {
     return scheduler
   }
 
-  update(id: number, dto: UpdateClassScheduleDto) {
-    return `This action ${dto} a #${id} classSchedule`
-  }
-
-  remove(id: number) {
-    return this.scheduleRepo.delete({ id })
+  async remove(id: number) {
+    return await this.scheduleRepo.delete({ id })
   }
 
   // Utilits
 
-  private getDate(): { week: number; year: string } {
+  private getDate(): { week: number; year: string; timelineStart: string; timelineEnd: string } {
     try {
       const fullYer = new Date().getFullYear()
       const date = new Date()
       const currentWeek = getWeek(date)
 
-      return { week: currentWeek, year: fullYer.toString() }
+      const curr = new Date()
+      const firstDay = new Date(curr.setDate(curr.getDate() - curr.getDay())).toISOString()
+      const lastDay = new Date(curr.setDate(curr.getDate() - curr.getDay() + 6)).toISOString()
+
+      return {
+        week: currentWeek,
+        year: fullYer.toString(),
+        timelineStart: `${firstDay}`,
+        timelineEnd: `${lastDay}`,
+      }
     } catch {
       throw new Error()
     }
@@ -95,23 +117,24 @@ export class ClassScheduleService {
 
   // Day scheduler
 
-  private async createDayScheduler(dto: CreateDaySchedulerDto) {
+  public async createDayScheduler(dto: CreateDaySchedulerDto) {
     const daySchedule = this.dayScheduleRepo.create({
       schedule: { id: dto.schedulerId },
-      time: dto.day.time,
-      dayName: dto.day.dayName,
+      time: dto.time,
+      dayName: dto.dayName,
       lessons: [],
       activeTeachers: [],
+      date: dto.date,
     })
 
     const lessons = await Promise.all(
-      dto.day.lessonsId.map(async id => {
+      dto.lessonsId.map(async id => {
         return await this.lessonRepo.findOne({ where: { id } })
       }),
     )
 
     const teachers = await Promise.all(
-      dto.day.activeTeachersId.map(async id => {
+      dto.activeTeachersId.map(async id => {
         return await this.teacherRepo.findOne({ where: { id } })
       }),
     )
@@ -120,5 +143,29 @@ export class ClassScheduleService {
     daySchedule.lessons.push(...lessons)
 
     return this.dayScheduleRepo.save(daySchedule)
+  }
+
+  public async removeDayInSchedule(dto: RemoveDayInScheduleDto) {
+    await Promise.all(
+      dto.daysId.map(async dayId => {
+        await this.dayScheduleRepo.delete({ id: dayId })
+      }),
+    )
+
+    return 'Ok'
+  }
+
+  private async checkIsEmptySchedule(dto: CheckIsEmptySchedule) {
+    const schedule = await this.scheduleRepo.findOne({
+      where: {
+        year: dto.currentYear,
+        currentWeek: dto.currentWeek,
+        class: { id: dto.classId },
+      },
+    })
+
+    if (schedule) throw new ForbiddenException('Расписание на эту неделю уже существует')
+
+    return 'Ok'
   }
 }

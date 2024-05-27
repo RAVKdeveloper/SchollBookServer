@@ -8,11 +8,11 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { Teacher } from '../accounts/teacher/entities/teacher.entity'
-import { Lesson } from './entities/lesson.entity'
-import { CreateLessonDto } from './dto/create-lesson.dto'
-import { UpdateLessonDto } from './dto/update-lesson.dto'
 import { AddTeacherToLessonDto } from './dto/add-teacher.dto'
+import { CreateLessonDto } from './dto/create-lesson.dto'
 import { RemoveTeacherInTheLessonDto } from './dto/remove-teacher.dto'
+import { UpdateLessonDto } from './dto/update-lesson.dto'
+import { Lesson } from './entities/lesson.entity'
 
 @Injectable()
 export class LessonsService {
@@ -22,7 +22,23 @@ export class LessonsService {
   ) {}
 
   async create(dto: CreateLessonDto) {
-    return await this.lessonRepo.save({ ...dto, school: { id: dto.school } })
+    const newLesson = await this.lessonRepo.save({
+      ...dto,
+      school: { id: dto.school },
+      classes: { id: dto.classId },
+    })
+
+    if (!dto.teachersId || dto.teachersId.length === 0) {
+      return newLesson
+    }
+
+    Promise.all(
+      dto.teachersId.map(async id => {
+        await this.addTeacher({ lessonId: newLesson.id, teacherId: id })
+      }),
+    )
+
+    return newLesson
   }
 
   findAll(id: number) {
@@ -35,7 +51,7 @@ export class LessonsService {
   findOne(id: number) {
     return this.lessonRepo.find({
       where: { id },
-      relations: { teacher: true },
+      relations: { teacher: true, classes: true },
     })
   }
 

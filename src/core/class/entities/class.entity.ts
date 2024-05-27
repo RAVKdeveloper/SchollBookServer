@@ -1,13 +1,13 @@
-import { Entity, Column, JoinColumn, ManyToMany, JoinTable, ManyToOne, OneToMany } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm'
 
 import { BasicEntity } from 'src/basic/basic.entity'
-import { School } from 'src/core/school/entities/school.entity'
-import { Lesson } from 'src/core/lessons/entities/lesson.entity'
-import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
 import { Student } from 'src/core/accounts/student/entities/student.entity'
-import { Point } from 'src/core/point-system/entities/point-system.entity'
+import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
 import { ClassSchedule } from 'src/core/class-schedule/entities/class-schedule.entity'
+import { Lesson } from 'src/core/lessons/entities/lesson.entity'
+import { Point } from 'src/core/point-system/entities/point-system.entity'
+import { School } from 'src/core/school/entities/school.entity'
 
 @Entity('class')
 export class Class extends BasicEntity {
@@ -29,9 +29,9 @@ export class Class extends BasicEntity {
   @JoinTable({ name: 'chief_teachers' })
   chiefs: Teacher[]
 
-  @ManyToMany(() => Lesson, lesson => lesson.classes, { nullable: true })
+  @OneToMany(() => Lesson, lesson => lesson.classes, { nullable: true })
   @ApiProperty({ default: [], enum: () => Lesson, description: 'Lessons this class' })
-  @JoinTable({ name: 'lessons' })
+  @JoinColumn({ name: 'lessons' })
   lessons: Lesson[]
 
   @ManyToMany(() => Student, student => student.class, { nullable: true })

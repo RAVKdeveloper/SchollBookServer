@@ -1,30 +1,33 @@
+import { CacheInterceptor } from '@nestjs/cache-manager'
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
 import {
-  ApiTags,
-  ApiCreatedResponse,
-  ApiOkResponse,
   ApiCookieAuth,
+  ApiCreatedResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger'
-import { CacheInterceptor } from '@nestjs/cache-manager'
 
 import { AuthGuard } from 'src/guards/auth.guard'
 import { OnlyTeacherGuard } from 'src/guards/teacher.guard'
 
-import { ClassSchedule } from './entities/class-schedule.entity'
 import { ClassScheduleService } from './class-schedule.service'
+import { ClassSchedule } from './entities/class-schedule.entity'
+
 import { CreateClassScheduleDto } from './dto/create-class-schedule.dto'
-import { UpdateClassScheduleDto } from './dto/update-class-schedule.dto'
+import { CreateDaySchedulerDto } from './dto/create-day-scheduler.dto'
+import { RemoveDayInScheduleDto } from './dto/remove-day.dto'
 
 @ApiTags('classSchedule')
 @ApiCookieAuth()
@@ -41,23 +44,33 @@ export class ClassScheduleController {
     return this.classScheduleService.create(createClassScheduleDto)
   }
 
-  @ApiOkResponse({ description: 'Get all class-schedules', isArray: true, type: ClassSchedule })
-  @Get()
-  findAll() {
-    return this.classScheduleService.findAll()
+  @UseGuards(OnlyTeacherGuard)
+  @ApiCreatedResponse({ description: 'Create new day schedule' })
+  @Put('/add-new-day')
+  addNewDaySchedule(@Body() dto: CreateDaySchedulerDto) {
+    return this.classScheduleService.createDayScheduler(dto)
   }
 
+  @UseGuards(OnlyTeacherGuard)
+  @ApiCreatedResponse({ description: 'Remove day in schedule' })
+  @Put('/remove-day')
+  removeDayInSchedule(@Body() dto: RemoveDayInScheduleDto) {
+    return this.classScheduleService.removeDayInSchedule(dto)
+  }
+
+  @UseGuards(OnlyTeacherGuard)
+  @ApiOkResponse({ description: 'Get all class-schedules', isArray: true, type: ClassSchedule })
+  @Get()
+  findAll(@Query('classId') classId: string) {
+    return this.classScheduleService.findAll(+classId)
+  }
+
+  @UseGuards(OnlyTeacherGuard)
   @ApiOkResponse({ description: 'Get one class-schedule', type: ClassSchedule })
   @ApiNotFoundResponse({ description: 'Расписание не найдено' })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.classScheduleService.findOne(+id)
-  }
-
-  @UseGuards(OnlyTeacherGuard)
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClassScheduleDto: UpdateClassScheduleDto) {
-    return this.classScheduleService.update(+id, updateClassScheduleDto)
   }
 
   @UseGuards(OnlyTeacherGuard)

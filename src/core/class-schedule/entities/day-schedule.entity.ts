@@ -1,10 +1,10 @@
-import { Entity, ManyToOne, ManyToMany, JoinTable, Column } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm'
 
 import { BasicEntity } from 'src/basic/basic.entity'
-import { Lesson } from 'src/core/lessons/entities/lesson.entity'
-import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
 import { Student } from 'src/core/accounts/student/entities/student.entity'
+import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
+import { Lesson } from 'src/core/lessons/entities/lesson.entity'
 import { Point } from 'src/core/point-system/entities/point-system.entity'
 import { ClassSchedule } from './class-schedule.entity'
 
@@ -25,9 +25,9 @@ export class DaySchedule extends BasicEntity {
   @JoinTable({ name: 'lessons_this_day' })
   lessons: Lesson[]
 
-  @ManyToMany(() => Point)
+  @OneToMany(() => Point, point => point.day)
   @ApiProperty({ example: [], description: 'This points in the day', enum: () => Point })
-  @JoinTable({ name: 'points_this_day' })
+  @JoinColumn({ name: 'points_this_day' })
   points: Point[]
 
   @ManyToOne(() => ClassSchedule, schedule => schedule.days, { onDelete: 'CASCADE' })
@@ -41,4 +41,8 @@ export class DaySchedule extends BasicEntity {
   @ApiProperty({ example: '8:00-8:45' })
   @Column({ nullable: true })
   time: string
+
+  @ApiProperty({ example: '2022/03/03', description: 'Date' })
+  @Column({ nullable: true, type: 'date' })
+  date: string
 }

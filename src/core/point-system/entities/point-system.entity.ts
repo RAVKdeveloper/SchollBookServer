@@ -1,11 +1,12 @@
-import { Entity, ManyToOne, Column, JoinColumn } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
 
 import { BasicEntity } from 'src/basic/basic.entity'
-import { School } from 'src/core/school/entities/school.entity'
 import { Student } from 'src/core/accounts/student/entities/student.entity'
-import { Lesson } from 'src/core/lessons/entities/lesson.entity'
+import { DaySchedule } from 'src/core/class-schedule/entities/day-schedule.entity'
 import { Class } from 'src/core/class/entities/class.entity'
+import { Lesson } from 'src/core/lessons/entities/lesson.entity'
+import { School } from 'src/core/school/entities/school.entity'
 
 @Entity('point')
 export class Point extends BasicEntity {
@@ -22,7 +23,7 @@ export class Point extends BasicEntity {
   @JoinColumn({ name: 'student' })
   student: Student
 
-  @ManyToOne(() => Lesson)
+  @ManyToOne(() => Lesson, { onDelete: 'CASCADE' })
   @ApiProperty({ enum: () => Lesson, description: 'Lesson' })
   @JoinColumn({ name: 'lesson' })
   lesson: Lesson
@@ -35,4 +36,8 @@ export class Point extends BasicEntity {
   @ApiProperty({ description: 'Class', enum: () => Class })
   @JoinColumn({ name: 'class' })
   classe: Class
+
+  @ManyToOne(() => DaySchedule, day => day.points, { onDelete: 'CASCADE' })
+  @ApiProperty({ description: 'Day', enum: () => DaySchedule })
+  day: DaySchedule
 }

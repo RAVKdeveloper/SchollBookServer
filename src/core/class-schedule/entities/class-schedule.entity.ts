@@ -1,5 +1,5 @@
-import { Entity, Column, ManyToOne, OneToMany } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm'
 
 import { BasicEntity } from 'src/basic/basic.entity'
 import { Class } from 'src/core/class/entities/class.entity'
@@ -26,4 +26,12 @@ export class ClassSchedule extends BasicEntity {
   @ApiProperty({ example: '2024' })
   @Column()
   year: string
+
+  @ApiProperty({ example: '19.04.2022-', description: 'Timeline start this week' })
+  @Column()
+  timelineStart: string
+
+  @ApiProperty({ example: '25.05.2022', description: 'Timeline end this week' })
+  @Column()
+  timelineEnd: string
 }

@@ -1,12 +1,7 @@
-import { IsNotEmpty, IsNumber } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
+import { IsArray, IsNotEmpty, IsNumber } from 'class-validator'
 
-export interface Day {
-  readonly activeTeachersId: number[]
-  readonly lessonsId: number[]
-  readonly dayName: string
-  readonly time: string
-}
+import { DayScheduleDto } from './day-schedule.dto'
 
 export class CreateClassScheduleDto {
   @ApiProperty({ example: 1, description: 'Class id' })
@@ -16,8 +11,10 @@ export class CreateClassScheduleDto {
 
   @ApiProperty({
     description: 'Days schedule',
-    example: { activeTeachersId: 1, lessonsId: 6, dayName: 'Friday', time: '8:00-8:45' },
+    isArray: true,
+    type: DayScheduleDto,
   })
   @IsNotEmpty()
-  readonly day: Day
+  @IsArray()
+  readonly days: DayScheduleDto[]
 }

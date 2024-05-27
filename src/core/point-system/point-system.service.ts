@@ -1,12 +1,12 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common'
+import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
 import { Cache } from 'cache-manager'
+import { Repository } from 'typeorm'
 
-import { Point } from './entities/point-system.entity'
 import { CreatePointSystemDto } from './dto/create-point-system.dto'
-import { UpdatePointSystemDto } from './dto/update-point-system.dto'
 import { FindAllClassPointsDto } from './dto/find-all-class.dto'
+import { UpdatePointSystemDto } from './dto/update-point-system.dto'
+import { Point } from './entities/point-system.entity'
 
 @Injectable()
 export class PointSystemService {
@@ -28,6 +28,7 @@ export class PointSystemService {
       student: { id: dto.studentId },
       lesson: { id: dto.lessonId },
       classe: { id: dto.classId },
+      day: { id: dto.dayId },
     })
   }
 
@@ -59,6 +60,7 @@ export class PointSystemService {
             userId: true,
           },
         },
+        day: true,
       },
     })
   }

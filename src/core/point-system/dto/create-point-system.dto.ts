@@ -29,4 +29,9 @@ export class CreatePointSystemDto {
   @IsNotEmpty()
   @IsNumber()
   readonly classId: number
+
+  @ApiProperty({ description: 'Day id', example: 1 })
+  @IsNotEmpty()
+  @IsNumber()
+  readonly dayId: number
 }
