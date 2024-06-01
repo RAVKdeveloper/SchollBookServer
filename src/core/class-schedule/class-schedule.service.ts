@@ -79,6 +79,9 @@ export class ClassScheduleService {
               userId: true,
             },
           },
+          homeWorks: {
+            lesson: true,
+          },
         },
       },
     })

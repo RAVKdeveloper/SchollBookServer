@@ -4,6 +4,7 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany
 import { BasicEntity } from 'src/basic/basic.entity'
 import { Student } from 'src/core/accounts/student/entities/student.entity'
 import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
+import { HomeWork } from 'src/core/home-work/entities/home-work.entity'
 import { Lesson } from 'src/core/lessons/entities/lesson.entity'
 import { Point } from 'src/core/point-system/entities/point-system.entity'
 import { ClassSchedule } from './class-schedule.entity'
@@ -33,6 +34,10 @@ export class DaySchedule extends BasicEntity {
   @ManyToOne(() => ClassSchedule, schedule => schedule.days, { onDelete: 'CASCADE' })
   @ApiProperty({ enum: () => ClassSchedule })
   schedule: ClassSchedule
+
+  @ApiProperty({ description: 'Home works', enum: () => HomeWork, isArray: true })
+  @OneToMany(() => HomeWork, homeWork => homeWork.daySchedule, { onDelete: 'CASCADE' })
+  homeWorks: HomeWork[]
 
   @ApiProperty({ example: 'Среда', description: 'Day week name' })
   @Column({ name: 'day_name' })

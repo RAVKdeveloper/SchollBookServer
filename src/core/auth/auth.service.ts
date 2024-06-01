@@ -1,18 +1,18 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
 import * as bcrypt from 'bcrypt'
 import { Response } from 'express'
+import { Repository } from 'typeorm'
 
-import { User } from '../user/entities/user.entity'
 import { JwtGenService } from '../jwt/jwt.service'
 import { MailService } from '../mail/mail.service'
+import { User } from '../user/entities/user.entity'
 import { AuthCode } from './entities/authCode.entity'
 
 import { CreateAuthDto } from './dto/create-auth.dto'
-import { UpdatePasswordDto } from './dto/update-pass.dto'
 import { ForgotPassDto } from './dto/forgot-pass.dto'
 import { LoginAuthDto } from './dto/login-auth.dto'
+import { UpdatePasswordDto } from './dto/update-pass.dto'
 import { VerifyCodeDto } from './dto/verify-code.dto'
 
 @Injectable()
@@ -24,7 +24,7 @@ export class AuthService {
     private readonly mailService: MailService,
   ) {}
 
-  async register(dto: CreateAuthDto, res: Response) {
+  async register(dto: CreateAuthDto) {
     const isEmptyUser = await this.userRepo.findOne({ where: { email: dto.email } })
 
     if (isEmptyUser) throw new ForbiddenException('Такой пользователь уже существует')
@@ -42,17 +42,10 @@ export class AuthService {
 
     await this.mailService.sendAuthOneCod({ to: user.email, code })
 
-    const acces_token = await this.tokenService.generateTokens({
-      userId: user.id,
-      userName: user.name,
-    })
-
-    res.cookie('acces_token_auth', acces_token, { httpOnly: true })
-
     return user
   }
 
-  async login(dto: LoginAuthDto, res: Response) {
+  async login(dto: LoginAuthDto) {
     const user = await this.userRepo.findOne({ where: { email: dto.email } })
 
     if (!user) throw new NotFoundException('Неверный логин или пароль')
@@ -61,13 +54,6 @@ export class AuthService {
 
     if (!isValidPass) throw new ForbiddenException('Неверный логин или пароль')
 
-    await this.userRepo.update({ email: user.email, id: user.id }, { isActivated: false })
-
-    const acces_token = await this.tokenService.generateTokens({
-      userId: user.id,
-      userName: user.name,
-    })
-
     const code = await this.createAuthCode(user)
 
     await this.mailService.sendAuthOneCod({
@@ -75,12 +61,10 @@ export class AuthService {
       to: user.email,
     })
 
-    res.cookie('acces_token_auth', acces_token, { httpOnly: true })
-
     return user
   }
 
-  async createAuthCode(user: User): Promise<number> {
+  private async createAuthCode(user: User): Promise<number> {
     const code = Math.ceil(Math.random() * 10000)
     const createCode = await this.verifyCodeRepo.save({ code, userId: user })
     return createCode.code
@@ -114,12 +98,12 @@ export class AuthService {
     return user
   }
 
-  async passwordUpdate(dto: UpdatePasswordDto) {
+  async passwordUpdate(dto: UpdatePasswordDto, res: Response) {
     const user = await this.userRepo.findOne({ where: { id: dto.id } })
 
     if (!user) throw new NotFoundException('Такого пользователя не существует')
 
-    await this.verifyAccount({ userId: dto.id, code: dto.code })
+    await this.verifyAccount({ userId: dto.id, code: dto.code }, res)
 
     const salt = await bcrypt.genSalt(10)
     const hashPassword = await bcrypt.hash(dto.password, salt)
@@ -131,19 +115,38 @@ export class AuthService {
     return { message: 'Пароль изменён' }
   }
 
-  async verifyAccount(dto: VerifyCodeDto) {
+  async verifyAccount(dto: VerifyCodeDto, res: Response) {
     const { userId, code } = dto
 
     const codeVer = await this.verifyCodeRepo.findOne({
       where: { code, userId: { id: userId } },
+      relations: { userId: true },
     })
 
     if (!codeVer) throw new ForbiddenException('Неверный код доступа')
 
-    await this.userRepo.update({ id: userId }, { isActivated: true })
-
     await this.verifyCodeRepo.delete({ userId: { id: userId } })
 
+    await this.mailService.loginMail({ email: codeVer.userId.email })
+
+    const access_token = await this.tokenService.generateTokens({
+      userId: codeVer.userId.id,
+      userName: codeVer.userId.name,
+    })
+
+    res.cookie('access_token_auth', access_token, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+
     return { message: 'Аккаунт подтверждён' }
+  }
+
+  async logout(res: Response) {
+    res.clearCookie('access_token_auth', { httpOnly: true })
+
+    res.end()
+
+    return 'Ok'
   }
 }

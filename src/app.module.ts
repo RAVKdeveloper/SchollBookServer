@@ -16,6 +16,7 @@ import { TeacherModule } from './core/accounts/teacher/teacher.module'
 import { AuthModule } from './core/auth/auth.module'
 import { ClassScheduleModule } from './core/class-schedule/class-schedule.module'
 import { ClassModule } from './core/class/class.module'
+import { HomeWorkModule } from './core/home-work/home-work.module'
 import { JwtGenService } from './core/jwt/jwt.service'
 import { LessonsModule } from './core/lessons/lessons.module'
 import { MailService } from './core/mail/mail.service'
@@ -76,6 +77,7 @@ import { UserModule } from './core/user/user.module'
     PointSystemModule,
     ClassScheduleModule,
     SheduleActionsModule,
+    HomeWorkModule,
   ],
   controllers: [],
   providers: [JwtGenService, MailService],

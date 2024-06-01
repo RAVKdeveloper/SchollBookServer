@@ -5,6 +5,7 @@ import { BasicEntity } from 'src/basic/basic.entity'
 import { Student } from 'src/core/accounts/student/entities/student.entity'
 import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
 import { ClassSchedule } from 'src/core/class-schedule/entities/class-schedule.entity'
+import { HomeWork } from 'src/core/home-work/entities/home-work.entity'
 import { Lesson } from 'src/core/lessons/entities/lesson.entity'
 import { Point } from 'src/core/point-system/entities/point-system.entity'
 import { School } from 'src/core/school/entities/school.entity'
@@ -47,4 +48,8 @@ export class Class extends BasicEntity {
   @ApiProperty({ description: 'Schedule', enum: () => ClassSchedule })
   @JoinColumn()
   schedule: ClassSchedule[]
+
+  @OneToMany(() => HomeWork, homeWork => homeWork.classe, { cascade: true })
+  @ApiProperty({ description: 'Home works', enum: () => HomeWork, isArray: true })
+  homeWorks: HomeWork[]
 }
