@@ -1,14 +1,14 @@
-import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
 
-import { User } from 'src/core/user/entities/user.entity'
 import { BasicEntity } from 'src/basic/basic.entity'
+import { User } from 'src/core/user/entities/user.entity'
 
 @Entity('auth_code')
 export class AuthCode extends BasicEntity {
   @ApiProperty({ example: '1111', description: 'Email verification code' })
   @Column({ nullable: false })
-  code: number
+  code: string
 
   @ApiProperty({ example: '1', description: 'User id' })
   @ManyToOne(() => User)

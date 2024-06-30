@@ -66,8 +66,13 @@ export class AuthService {
 
   private async createAuthCode(user: User): Promise<number> {
     const code = Math.ceil(Math.random() * 10000)
-    const createCode = await this.verifyCodeRepo.save({ code, userId: user })
-    return createCode.code
+
+    const salt = await bcrypt.genSalt(10)
+    const hashCode = await bcrypt.hash(code.toString(), salt)
+
+    await this.verifyCodeRepo.save({ code: hashCode, userId: user })
+
+    return code
   }
 
   async me(id: number) {
@@ -119,11 +124,18 @@ export class AuthService {
     const { userId, code } = dto
 
     const codeVer = await this.verifyCodeRepo.findOne({
-      where: { code, userId: { id: userId } },
+      where: { userId: { id: userId } },
       relations: { userId: true },
+      order: {
+        id: 'DESC',
+      },
     })
 
     if (!codeVer) throw new ForbiddenException('Неверный код доступа')
+
+    const isValidCode = await bcrypt.compare(code.toString(), codeVer.code)
+
+    if (!isValidCode) throw new ForbiddenException('Неверный код доступа')
 
     await this.verifyCodeRepo.delete({ userId: { id: userId } })
 

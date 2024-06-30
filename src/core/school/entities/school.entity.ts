@@ -1,10 +1,10 @@
-import { Entity, OneToOne, Column, JoinColumn, OneToMany } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
 
-import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
-import { Student } from 'src/core/accounts/student/entities/student.entity'
-import { Owner } from 'src/core/accounts/owner/entities/owner.entity'
 import { BasicEntity } from 'src/basic/basic.entity'
+import { Owner } from 'src/core/accounts/owner/owner.entity'
+import { Student } from 'src/core/accounts/student/entities/student.entity'
+import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
 import { Class } from 'src/core/class/entities/class.entity'
 import { Lesson } from 'src/core/lessons/entities/lesson.entity'
 

@@ -5,12 +5,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { ScheduleModule } from '@nestjs/schedule'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { PrometheusModule } from '@willsoto/nestjs-prometheus'
 import { redisStore } from 'cache-manager-redis-yet'
 
 import configuration from 'src/config/configuration'
 import { typeOrmConfig } from 'src/config/typeorm.config'
 
-import { OwnerModule } from './core/accounts/owner/owner.module'
 import { StudentModule } from './core/accounts/student/student.module'
 import { TeacherModule } from './core/accounts/teacher/teacher.module'
 import { AuthModule } from './core/auth/auth.module'
@@ -20,6 +20,7 @@ import { HomeWorkModule } from './core/home-work/home-work.module'
 import { JwtGenService } from './core/jwt/jwt.service'
 import { LessonsModule } from './core/lessons/lessons.module'
 import { MailService } from './core/mail/mail.service'
+import { OrganizationsModule } from './core/organizations/organizations.module'
 import { PointSystemModule } from './core/point-system/point-system.module'
 import { SchoolModule } from './core/school/school.module'
 import { SheduleActionsModule } from './core/shedule-actions/shedule-actions.module'
@@ -65,10 +66,12 @@ import { UserModule } from './core/user/user.module'
       },
       inject: [ConfigService],
     }),
+    PrometheusModule.register({
+      path: '/metrics',
+    }),
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
-    OwnerModule,
     StudentModule,
     TeacherModule,
     SchoolModule,
@@ -78,6 +81,7 @@ import { UserModule } from './core/user/user.module'
     ClassScheduleModule,
     SheduleActionsModule,
     HomeWorkModule,
+    OrganizationsModule,
   ],
   controllers: [],
   providers: [JwtGenService, MailService],
