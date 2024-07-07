@@ -1,50 +1,60 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { ILike, Repository } from 'typeorm'
 
-import { Owner } from '../accounts/owner/entities/owner.entity'
 import { School } from './entities/school.entity'
-import { CreateSchoolDto } from './dto/create-school.dto'
+
+import { FindAllSchoolsDto } from './dto/find-all-schools.dto'
 
 @Injectable()
 export class SchoolService {
-  constructor(
-    @InjectRepository(School) private schoolRepo: Repository<School>,
-    @InjectRepository(Owner) private ownerRepo: Repository<Owner>,
-  ) {}
+  constructor(@InjectRepository(School) private schoolRepo: Repository<School>) {}
 
-  async create(dto: CreateSchoolDto, userId: number, ip: string) {
-    const owner = await this.ownerRepo.findOne({ where: { userId: { id: userId }, school: null } })
+  public async findAll(dto: FindAllSchoolsDto) {
+    if (isNaN(+dto.limit) || isNaN(+dto.page)) {
+      throw new BadRequestException('Невалидные данные')
+    }
 
-    if (!owner) throw new NotFoundException('Пользователь не найден')
+    const take = +dto.limit ?? 10
+    const skip = (+dto.page - 1) * take
 
-    const isEmpty = await this.schoolRepo.findOne({ where: { licenseNumber: dto.licenseNumber } })
+    const whereArray = this.getWhereObjByFilters(dto)
 
-    if (isEmpty) throw new ForbiddenException('Такая школа уже существует')
-
-    const newSchool = await this.schoolRepo.save({ ...dto, ip, owner: owner })
-
-    return newSchool
-  }
-
-  async findAll() {
-    return await this.schoolRepo.find({
-      relations: { owner: true, teachers: true, students: true },
+    const schools = await this.schoolRepo.find({
+      relations: { owner: true },
+      where: whereArray,
+      skip,
+      take,
+      order: {
+        id: 'DESC',
+      },
     })
+
+    const count = await this.schoolRepo.countBy(whereArray)
+
+    return { count, data: schools }
   }
 
-  async findOne(id: number) {
+  public async findOne(id: number) {
     return await this.schoolRepo.findOne({
       where: { id },
       relations: { owner: true, teachers: true, lessons: true },
     })
   }
 
-  async remove(id: number, userId: number) {
-    const owner = await this.ownerRepo.findOne({ where: { userId: { id: userId } } })
+  private getWhereObjByFilters(dto: FindAllSchoolsDto) {
+    const whereArr = []
 
-    if (!owner) throw new NotFoundException('Пользователь не найден')
+    if (dto.searchValue) {
+      const arr = [
+        { name: ILike(`%${dto.searchValue}%`) },
+        { location: ILike(`%${dto.searchValue}%`) },
+        { region: ILike(`%${dto.searchValue}%`) },
+      ]
 
-    return this.schoolRepo.delete({ id, owner })
+      whereArr.push(...arr)
+    }
+
+    return whereArr
   }
 }

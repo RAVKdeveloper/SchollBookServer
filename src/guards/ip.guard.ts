@@ -11,7 +11,7 @@ export class IpGuard implements CanActivate {
 
     if (!ip || ip.length === 0) throw new ForbiddenException('Не удалось определить ip аддрес')
 
-    if (Array.isArray(ip)) request['ip'] = ip.join(',')
+    if (Array.isArray(ip)) request[CustomHeaders.IP] = ip.join(',')
     else request[CustomHeaders.IP] = ip
 
     return true

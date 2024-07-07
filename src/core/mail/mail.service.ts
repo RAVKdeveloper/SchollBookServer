@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { MailerService } from '@nestjs-modules/mailer'
 
 import { AuthCodeDto } from './dto/authCode.dto'
 import { LoginMailDto } from './dto/loginMail.dto'
+import { MailSuccessfulCreateClassDto } from './dto/successful-create-class.dto'
 
 @Injectable()
 export class MailService {
@@ -77,6 +78,42 @@ export class MailService {
       return { message: 'Message send' }
     } catch (e) {
       throw new Error('Произошла Ошибка при отправке письма')
+    }
+  }
+
+  async successfulCreateClass(dto: MailSuccessfulCreateClassDto) {
+    try {
+      await this.service.sendMail({
+        from: process.env.FROM_ADDRES,
+        to: dto.email,
+        subject: 'Вы создали класс',
+        text: 'Создание класса',
+        html: `<div>
+                     ID школы: ${dto.school}
+                   </div>
+                   <ul>
+                   <li>
+                   Класс: ${dto.class}
+                   </li>
+                   <li>
+                   Создателя: ${dto.createrUsername}
+                   </li>
+                   </ul>
+                   <div>
+                     Время: ${new Date().toLocaleDateString('ru-RU', {
+                       year: 'numeric',
+                       month: 'long',
+                       day: 'numeric',
+                       hour: 'numeric',
+                       minute: 'numeric',
+                     })}
+                   </div>
+                `,
+      })
+
+      return { message: 'Message send' }
+    } catch {
+      throw new InternalServerErrorException('Прозошла неизвестная ошибка')
     }
   }
 }

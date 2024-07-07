@@ -1,5 +1,5 @@
-import { Entity, Column } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity } from 'typeorm'
 
 import { BasicEntity } from 'src/basic/basic.entity'
 
@@ -30,7 +30,7 @@ export class User extends BasicEntity {
   avatar: string
 
   @ApiProperty({ example: false, description: 'Is active user account' })
-  @Column({ default: false })
+  @Column({ default: true })
   isActivated: boolean
 
   @ApiProperty({ example: false, description: 'Is blocked user account' })

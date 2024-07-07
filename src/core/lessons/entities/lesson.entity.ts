@@ -1,8 +1,9 @@
-import { Entity, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm'
 
 import { BasicEntity } from 'src/basic/basic.entity'
 import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
+import { Class } from 'src/core/class/entities/class.entity'
 import { School } from 'src/core/school/entities/school.entity'
 
 @Entity('lesson')
@@ -15,8 +16,8 @@ export class Lesson extends BasicEntity {
   @Column({ nullable: true })
   icon: string
 
+  @ApiProperty({ default: School, type: () => School })
   @ManyToOne(() => School, { onDelete: 'CASCADE' })
-  @ApiProperty({ default: School, enum: () => School })
   @JoinColumn()
   school: School
 
@@ -24,7 +25,11 @@ export class Lesson extends BasicEntity {
     onDelete: 'CASCADE',
     nullable: true,
   })
-  @ApiProperty({ enum: () => Teacher, description: 'Teacher' })
+  @ApiProperty({ type: () => Teacher, description: 'Teacher', isArray: true })
   @JoinTable()
   teacher: Teacher[]
+
+  @ApiProperty({ type: () => Class, description: 'Classes' })
+  @ManyToOne(() => Class, classe => classe.lessons, { onDelete: 'CASCADE' })
+  classes: Class
 }

@@ -1,10 +1,11 @@
-import { Entity, OneToOne, Column, JoinColumn, OneToMany } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
 
-import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
-import { Student } from 'src/core/accounts/student/entities/student.entity'
-import { Owner } from 'src/core/accounts/owner/entities/owner.entity'
 import { BasicEntity } from 'src/basic/basic.entity'
+import { Student } from 'src/core/accounts/accounts/entities/student.entity'
+import { Owner } from 'src/core/accounts/owner/owner.entity'
+import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
+import { Class } from 'src/core/class/entities/class.entity'
 import { Lesson } from 'src/core/lessons/entities/lesson.entity'
 
 @Entity('school')
@@ -33,7 +34,7 @@ export class School extends BasicEntity {
   licenseImg: string
 
   @OneToOne(() => Owner, owner => owner.school)
-  @ApiProperty({ example: '1', description: 'Owner id', enum: () => Owner })
+  @ApiProperty({ description: 'Owner id', type: () => Owner })
   @JoinColumn({ name: 'owner_id' })
   owner: Owner
 
@@ -45,18 +46,23 @@ export class School extends BasicEntity {
   @Column({ name: 'ip' })
   ip: string
 
+  @ApiProperty({ isArray: true, description: 'Students id', type: () => Student })
   @OneToMany(() => Student, student => student.school, { onDelete: 'CASCADE' })
-  @ApiProperty({ default: [], description: 'Students id', enum: () => Student })
   students: Student[]
 
+  @ApiProperty({ isArray: true, description: 'Teachers id', type: () => Teacher })
   @OneToMany(() => Teacher, teacher => teacher.school, { onDelete: 'CASCADE' })
-  @ApiProperty({ default: [], description: 'Teachers id', enum: () => Teacher })
   teachers: Teacher[]
 
+  @ApiProperty({ type: () => Lesson, isArray: true })
   @OneToMany(() => Lesson, lesson => lesson.school)
-  @ApiProperty({ default: [], enum: () => Lesson })
   @JoinColumn()
   lessons: Lesson[]
+
+  @ApiProperty({ isArray: true, type: () => Class })
+  @OneToMany(() => Class, classe => classe.school)
+  @JoinColumn()
+  classes: Class[]
 
   @ApiProperty({ example: 'Moscow', description: 'Region from this school' })
   @Column()

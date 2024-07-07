@@ -9,7 +9,7 @@ export class TypeOrmConfigClass {
       port: config.get('dbport'),
       username: config.get('dblogin'),
       password: config.get('password'),
-      database: config.get('namedb'),
+      database: config.get('dbname'),
       // entities: [__dirname + '/**/*.entity{.js,.ts}'],
       synchronize: true,
       autoLoadEntities: true,

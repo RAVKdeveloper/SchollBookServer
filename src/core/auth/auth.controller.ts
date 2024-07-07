@@ -1,24 +1,24 @@
-import { Controller, Get, Post, Body, Res, UseGuards, Req, Patch } from '@nestjs/common'
+import { Body, Controller, Get, Patch, Post, Put, Req, Res, UseGuards } from '@nestjs/common'
 import {
-  ApiTags,
+  ApiCookieAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
-  ApiOkResponse,
   ApiNotFoundResponse,
-  ApiCookieAuth,
+  ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger'
-import { Response, Request } from 'express'
+import { Request, Response } from 'express'
 
-import { AuthGuard } from 'src/guards/auth.guard'
 import { CustomHeaders } from 'src/basic/headers.type'
+import { AuthGuard } from 'src/guards/auth.guard'
 import { User } from '../user/entities/user.entity'
 import { AuthService } from './auth.service'
 
 import { CreateAuthDto } from './dto/create-auth.dto'
-import { LoginAuthDto } from './dto/login-auth.dto'
 import { ForgotPassDto } from './dto/forgot-pass.dto'
-import { VerifyCodeDto } from './dto/verify-code.dto'
+import { LoginAuthDto } from './dto/login-auth.dto'
 import { UpdatePasswordDto } from './dto/update-pass.dto'
+import { VerifyCodeDto } from './dto/verify-code.dto'
 
 @Controller('auth')
 @ApiTags('auth')
@@ -31,8 +31,8 @@ export class AuthController {
   })
   @ApiForbiddenResponse({ description: 'Пользователь с таким emаil уже существует' })
   @Post('register')
-  registr(@Body() dto: CreateAuthDto, @Res({ passthrough: true }) res: Response) {
-    return this.authService.register(dto, res)
+  registration(@Body() dto: CreateAuthDto) {
+    return this.authService.register(dto)
   }
 
   @ApiOkResponse({
@@ -41,8 +41,8 @@ export class AuthController {
   })
   @ApiNotFoundResponse({ description: 'Неверный логин или пароль' })
   @Post('login')
-  login(@Body() dto: LoginAuthDto, @Res({ passthrough: true }) res: Response) {
-    return this.authService.login(dto, res)
+  login(@Body() dto: LoginAuthDto) {
+    return this.authService.login(dto)
   }
 
   @ApiOkResponse({
@@ -68,17 +68,26 @@ export class AuthController {
   @ApiCookieAuth()
   @ApiCreatedResponse({ description: 'Verify account' })
   @ApiForbiddenResponse({ description: 'Неверный код доступа' })
-  @UseGuards(AuthGuard)
   @Post('verify')
-  verifyAccount(@Body() dto: VerifyCodeDto) {
-    return this.authService.verifyAccount(dto)
+  verifyAccount(@Body() dto: VerifyCodeDto, @Res({ passthrough: true }) res: Response) {
+    return this.authService.verifyAccount(dto, res)
   }
 
   @ApiOkResponse({ description: 'Пароль изменён' })
   @ApiForbiddenResponse({ description: 'Неверный код доступа' })
   @ApiNotFoundResponse({ description: 'Такого пользователя не существует' })
+  @UseGuards(AuthGuard)
   @Patch('updatePass')
-  passwordUpdate(@Body() dto: UpdatePasswordDto) {
-    return this.authService.passwordUpdate(dto)
+  passwordUpdate(@Body() dto: UpdatePasswordDto, @Res({ passthrough: true }) res: Response) {
+    return this.authService.passwordUpdate(dto, res)
+  }
+
+  @ApiOkResponse({ description: 'Delete cookie' })
+  @ApiCookieAuth()
+  @ApiForbiddenResponse({ description: 'Нет токена' })
+  @UseGuards(AuthGuard)
+  @Put('/logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    return this.authService.logout(res)
   }
 }

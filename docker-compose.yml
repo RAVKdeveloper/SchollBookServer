@@ -1,0 +1,65 @@
+version: '3.1'
+
+services:
+  schoolbook:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - .env
+    command: npm run start:dev
+    ports:
+      - '5001:5001'
+    depends_on:
+      - redis
+      - postgres
+      - clickhouse
+    links:
+      - redis
+      - postgres
+      - clickhouse
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis:/data
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_URL: ${REDIS_URL}
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${NAMEDB}
+      POSTGRES_USER: ${DBLOGIN}
+      POSTGRES_PASSWORD: ${PASSWORD}
+    ports:
+      - '5432:5432'
+    volumes:
+      - /var/lib/postgresql/data:/var/lib/postgresql/data
+  clickhouse:
+    image: yandex/clickhouse-server
+    ports:
+      - '8133:8123'
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse/data
+    restart: always
+    command:
+      clickhouse-client --host localhost --port 9000 --user default --password '' --query 'CREATE TABLE logs (
+      timestamp DateTime,
+      level String,
+      message String,
+      data String
+      ) ENGINE = MergeTree() ORDER BY timestamp;
+      '
+volumes:
+  redis:
+    driver: local
+  clickhouse-data:
+    driver: local
+  docker-nest-postgres:
