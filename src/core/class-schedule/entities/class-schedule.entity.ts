@@ -12,11 +12,11 @@ export class ClassSchedule extends BasicEntity {
   isTheTopWeek: boolean
 
   @OneToMany(() => DaySchedule, day => day.schedule)
-  @ApiProperty({ default: [], description: 'Days this week', enum: () => DaySchedule })
+  @ApiProperty({ isArray: true, description: 'Days this week', type: () => DaySchedule })
   days: DaySchedule[]
 
+  @ApiProperty({ description: 'Class', type: () => Class })
   @ManyToOne(() => Class, clas => clas.schedule)
-  @ApiProperty({ description: 'Class', enum: () => Class })
   class: Class
 
   @ApiProperty({ example: 17 })

@@ -16,8 +16,8 @@ export class Lesson extends BasicEntity {
   @Column({ nullable: true })
   icon: string
 
+  @ApiProperty({ default: School, type: () => School })
   @ManyToOne(() => School, { onDelete: 'CASCADE' })
-  @ApiProperty({ default: School, enum: () => School })
   @JoinColumn()
   school: School
 
@@ -25,11 +25,11 @@ export class Lesson extends BasicEntity {
     onDelete: 'CASCADE',
     nullable: true,
   })
-  @ApiProperty({ enum: () => Teacher, description: 'Teacher' })
+  @ApiProperty({ type: () => Teacher, description: 'Teacher', isArray: true })
   @JoinTable()
   teacher: Teacher[]
 
+  @ApiProperty({ type: () => Class, description: 'Classes' })
   @ManyToOne(() => Class, classe => classe.lessons, { onDelete: 'CASCADE' })
-  @ApiProperty({ enum: () => Class, description: 'Classes' })
   classes: Class
 }

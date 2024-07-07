@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { Student } from 'src/core/accounts/student/entities/student.entity'
+import { Student } from 'src/core/accounts/accounts/entities/student.entity'
 import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
 import { Point } from 'src/core/point-system/entities/point-system.entity'
 import { Class } from '../class/entities/class.entity'

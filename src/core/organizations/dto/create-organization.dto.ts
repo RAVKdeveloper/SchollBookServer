@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
+import {
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator'
 
 export class CreateOrganizationDto {
   @ApiProperty({ description: 'Name', example: 'Pervie' })
@@ -22,11 +30,6 @@ export class CreateOrganizationDto {
   @IsArray()
   readonly tags: string[]
 
-  @ApiProperty({ description: 'Participants id', isArray: true, example: [1] })
-  @IsNotEmpty()
-  @IsArray()
-  readonly participants: number[]
-
   @ApiProperty({ description: 'Is private', example: false })
   @IsNotEmpty()
   @IsBoolean()
@@ -36,4 +39,9 @@ export class CreateOrganizationDto {
   @IsNotEmpty()
   @IsBoolean()
   readonly isGlobal: boolean
+
+  @ApiProperty({ description: 'Side url', example: 'http://localhost:2444', required: false })
+  @IsOptional()
+  @IsUrl()
+  readonly sideUrl?: string
 }

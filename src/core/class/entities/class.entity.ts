@@ -1,8 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm'
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm'
 
 import { BasicEntity } from 'src/basic/basic.entity'
-import { Student } from 'src/core/accounts/student/entities/student.entity'
+import { Parent } from 'src/core/accounts/accounts/entities/parent.entity'
+import { Student } from 'src/core/accounts/accounts/entities/student.entity'
 import { Teacher } from 'src/core/accounts/teacher/entities/teacher.entity'
 import { ClassSchedule } from 'src/core/class-schedule/entities/class-schedule.entity'
 import { HomeWork } from 'src/core/home-work/entities/home-work.entity'
@@ -20,36 +30,45 @@ export class Class extends BasicEntity {
   @Column()
   parallel: string
 
+  @ApiProperty({ description: 'School', type: () => School })
   @ManyToOne(() => School, school => school.classes)
-  @ApiProperty({ default: School, description: 'School', enum: () => School })
+  @Index('school_id')
   @JoinColumn({ name: 'school' })
   school: School
 
+  @ApiProperty({ type: () => Teacher, isArray: true, description: 'Chief this class' })
   @ManyToMany(() => Teacher, teacher => teacher.class, { nullable: true })
-  @ApiProperty({ default: [], enum: () => Teacher, description: 'Chief this class' })
   @JoinTable({ name: 'chief_teachers' })
   chiefs: Teacher[]
 
+  @ApiProperty({
+    type: () => Lesson,
+    isArray: true,
+    description: 'Lessons this class',
+  })
   @OneToMany(() => Lesson, lesson => lesson.classes, { nullable: true })
-  @ApiProperty({ default: [], enum: () => Lesson, description: 'Lessons this class' })
   @JoinColumn({ name: 'lessons' })
   lessons: Lesson[]
 
+  @ApiProperty({ description: 'Students for class', type: () => Student, isArray: true })
   @ManyToMany(() => Student, student => student.class, { nullable: true })
-  @ApiProperty({ default: [], description: 'Students for class', enum: () => Student })
   @JoinTable({ name: 'students_table' })
   students: Student[]
 
+  @ApiProperty({ description: 'Points', type: () => Point, isArray: true })
   @OneToMany(() => Point, point => point.classe)
-  @ApiProperty({ description: 'Points', enum: () => Point })
   points: Point[]
 
+  @ApiProperty({ description: 'Schedule', type: () => ClassSchedule, isArray: true })
   @OneToMany(() => ClassSchedule, schedule => schedule.class)
-  @ApiProperty({ description: 'Schedule', enum: () => ClassSchedule })
   @JoinColumn()
   schedule: ClassSchedule[]
 
+  @ApiProperty({ description: 'Home works', type: () => HomeWork, isArray: true })
   @OneToMany(() => HomeWork, homeWork => homeWork.classe, { cascade: true })
-  @ApiProperty({ description: 'Home works', enum: () => HomeWork, isArray: true })
   homeWorks: HomeWork[]
+
+  @ApiProperty({ description: 'Parents', type: () => Parent, isArray: true })
+  @ManyToMany(() => Parent, parent => parent.classes)
+  readonly parents: Parent[]
 }

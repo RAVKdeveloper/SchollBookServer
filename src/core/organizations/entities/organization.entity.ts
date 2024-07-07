@@ -1,9 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm'
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm'
 
 import { BasicEntity } from 'src/basic/basic.entity'
 import { School } from 'src/core/school/entities/school.entity'
 import { User } from 'src/core/user/entities/user.entity'
+import { Subscription } from './subsription.entity'
 
 @Entity('organizations')
 export class Organization extends BasicEntity {
@@ -11,15 +20,15 @@ export class Organization extends BasicEntity {
   @Column({ unique: true })
   readonly name: string
 
-  @ApiProperty({ description: 'School', enum: () => School })
+  @ApiProperty({ description: 'School', type: () => School })
   @ManyToOne(() => School, { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'school' })
   readonly school: School | null
 
-  @ApiProperty({ description: 'Participants', enum: () => User, isArray: true })
-  @ManyToMany(() => User)
+  @ApiProperty({ description: 'Participants', type: () => Subscription, isArray: true })
+  @OneToMany(() => Subscription, subsript => subsript.organization)
   @JoinTable({ name: 'participants_in_organization' })
-  readonly participants: User[]
+  readonly participants: Subscription[]
 
   @ApiProperty({ description: 'Is blocked', example: false })
   @Column({ default: false })
@@ -44,7 +53,7 @@ export class Organization extends BasicEntity {
   })
   readonly avatar: string
 
-  @ApiProperty({ description: 'Creator', enum: () => User })
+  @ApiProperty({ description: 'Creator', type: () => User })
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'creator' })
   readonly creator: User
@@ -61,6 +70,11 @@ export class Organization extends BasicEntity {
   @Column({ default: false, name: 'is_verify' })
   readonly isVerify: boolean
 
-  @Column({ nullable: true, type: 'timestamp' })
+  @ApiProperty({ description: 'DeletedAt', example: '2024-06-07::2de' })
+  @DeleteDateColumn({ nullable: true, type: 'timestamp' })
   deletedAt: Date
+
+  @ApiProperty({ description: 'Side url', example: 'http://localhost:3050', nullable: true })
+  @Column({ nullable: true, name: 'side_url' })
+  readonly sideUrl: string
 }

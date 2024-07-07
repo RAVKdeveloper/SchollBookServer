@@ -77,8 +77,11 @@ export class AuthService {
 
   async me(id: number) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...user } = await this.userRepo.findOne({
+    const user = await this.userRepo.findOne({
       where: { id },
+      select: {
+        password: false,
+      },
     })
 
     if (!user) throw new NotFoundException('Пользователь с таким id небыл найден')

@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { InjectRepository } from '@nestjs/typeorm'
 import { Raw, Repository } from 'typeorm'
 
-import { Student } from '../accounts/student/entities/student.entity'
+import { Student } from '../accounts/accounts/entities/student.entity'
 import { ClassSchedule } from '../class-schedule/entities/class-schedule.entity'
 import { DaySchedule } from '../class-schedule/entities/day-schedule.entity'
 

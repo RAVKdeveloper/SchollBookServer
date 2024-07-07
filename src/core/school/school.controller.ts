@@ -1,9 +1,12 @@
 import { CacheInterceptor } from '@nestjs/cache-manager'
-import { Controller, Get, Param, UseInterceptors } from '@nestjs/common'
+import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common'
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger'
 
 import { School } from './entities/school.entity'
 import { SchoolService } from './school.service'
+
+import { FindAllSchoolsDto } from './dto/find-all-schools.dto'
+import { ResponseGetAllSchoolsDto } from './res-dto/get-all-schools.dto'
 
 @ApiTags('School')
 @UseInterceptors(CacheInterceptor)
@@ -13,12 +16,12 @@ export class SchoolController {
 
   @ApiOkResponse({
     description: 'Get all schools',
-    type: School,
+    type: ResponseGetAllSchoolsDto,
     isArray: true,
   })
   @Get()
-  findAll() {
-    return this.schoolService.findAll()
+  findAll(@Query() dto: FindAllSchoolsDto) {
+    return this.schoolService.findAll(dto)
   }
 
   @ApiOkResponse({ description: 'Get school', type: School })

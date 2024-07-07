@@ -1,44 +1,32 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { ILike, In, MoreThan, Repository } from 'typeorm'
+import { ILike, In, IsNull, MoreThan, Not, Repository } from 'typeorm'
 
-import { User } from 'src/core/user/entities/user.entity'
+import { TypesSubsription } from 'src/basic/subscription.type'
+
 import { Organization } from './entities/organization.entity'
+import { Subscription } from './entities/subsription.entity'
 
+import { ActionsSubscriptionDto } from './dto/actio-subscription.dto'
 import { CreateOrganizationDto } from './dto/create-organization.dto'
 import { FindAllOrganizationsDto } from './dto/find-all-organizations.dto'
+import { QueryAllOrganizationsDto } from './dto/query-organizations.dto'
 import { UpdateOrganizationDto } from './dto/update-organization.dto'
 
 @Injectable()
 export class OrganizationsService {
-  constructor(@InjectRepository(Organization) private organizationRepo: Repository<Organization>) {}
+  constructor(
+    @InjectRepository(Organization) private organizationRepo: Repository<Organization>,
+    @InjectRepository(Subscription) private subscriptionRepo: Repository<Subscription>,
+  ) {}
 
   public async create(dto: CreateOrganizationDto, userId: number) {
     try {
       const newOrganization = await this.organizationRepo.manager.transaction(
         async entityManager => {
-          const participantsArray: User[] = []
-          const participantsCount = { value: 0 }
-
-          if (dto.participants && dto.participants.length > 0) {
-            const participants = await entityManager.find(User, {
-              where: {
-                id: In(dto.participants),
-              },
-            })
-
-            if (participants.length === 0) throw new NotFoundException('Участники не найдены')
-
-            participantsCount.value = participants.length
-
-            participantsArray.push(...participants)
-          }
-
           return await entityManager.save(Organization, {
             ...dto,
             school: dto.schoolId ? { id: dto.schoolId } : null,
-            participants: participantsArray,
-            participantsCount: participantsCount.value,
             creator: { id: userId },
           })
         },
@@ -123,6 +111,144 @@ export class OrganizationsService {
     return { message: 'Ok' }
   }
 
+  public async removeHard(id: number, userId: number) {
+    const isNotEmptyOrganization = await this.organizationRepo.findOne({
+      where: {
+        id,
+        creator: { id: userId },
+      },
+    })
+
+    if (!isNotEmptyOrganization) throw new NotFoundException('Организация не найдена')
+
+    await this.organizationRepo.delete({
+      id: isNotEmptyOrganization.id,
+    })
+
+    return { message: 'Ok' }
+  }
+
+  public async recover(id: number, userId: number) {
+    const organization = await this.organizationRepo.findOne({
+      where: {
+        id,
+        creator: { id: userId },
+        deletedAt: Not(IsNull()),
+      },
+      withDeleted: true,
+    })
+
+    if (!organization) throw new NotFoundException('Организация не найдена')
+
+    await this.organizationRepo.update(
+      {
+        id: organization.id,
+      },
+      { deletedAt: null },
+    )
+
+    return { message: 'Ok' }
+  }
+
+  public async getMyOrganizations(userId: number, dto: QueryAllOrganizationsDto) {
+    const take = dto.limit ? +dto.limit : 10
+    const skip = (+dto.page - 1) * take
+
+    const organizations = await this.organizationRepo.find({
+      relations: {
+        creator: true,
+        school: true,
+      },
+      where: [{ participants: { id: userId } }, { creator: { id: userId } }],
+      order: {
+        participantsCount: 'DESC',
+        id: 'DESC',
+      },
+      take,
+      skip,
+    })
+
+    const count = await this.organizationRepo.countBy([
+      { participants: { id: userId } },
+      { creator: { id: userId } },
+    ])
+
+    return { count, data: organizations }
+  }
+
+  public async actionSubscription(dto: ActionsSubscriptionDto, userId: number) {
+    try {
+      await this.organizationRepo.manager.transaction(async entityManager => {
+        const organization = await entityManager.findOne(Organization, {
+          where: {
+            id: dto.organizationId,
+          },
+        })
+
+        if (!organization) throw new NotFoundException('Организация не найдена')
+
+        if (dto.type === TypesSubsription.SUB) {
+          await entityManager.save(Subscription, {
+            user: { id: userId },
+            organization: { id: dto.organizationId },
+            organizationId: dto.organizationId,
+          })
+
+          await entityManager.update(
+            Organization,
+            { id: organization.id },
+            {
+              participantsCount: organization.participantsCount + 1,
+            },
+          )
+        } else if (dto.type === TypesSubsription.UNSUB) {
+          await entityManager.delete(Subscription, {
+            user: { id: userId },
+            organization: { id: dto.organizationId },
+            organizationId: dto.organizationId,
+          })
+
+          await entityManager.update(
+            Organization,
+            { id: organization.id },
+            {
+              participantsCount: organization.participantsCount - 1,
+            },
+          )
+        }
+      })
+
+      return { message: 'Ok' }
+    } catch (e) {
+      throw e
+    }
+  }
+
+  public async getAllParticipantsByOrganizationId(id: number, dto: QueryAllOrganizationsDto) {
+    const take = +dto.limit ?? 10
+    const skip = (+dto.page - 1) * take
+
+    const subscriptions = await this.subscriptionRepo.find({
+      relations: {
+        user: true,
+      },
+      where: {
+        organization: { id: id },
+      },
+      order: {
+        id: 'DESC',
+      },
+      take,
+      skip,
+    })
+
+    const count = await this.subscriptionRepo.countBy({
+      organization: { id: id },
+    })
+
+    return { count, data: subscriptions }
+  }
+
   private getWhereObjByFilters(dto: FindAllOrganizationsDto, userId: number) {
     const take = dto.limit ?? 10
     const page = take * (dto.page - 1)
@@ -151,7 +277,7 @@ export class OrganizationsService {
     }
 
     if (dto.isGlobal) {
-      whereObj.school = null
+      delete whereObj.school
       whereObj.isGlobal = dto.isGlobal
     }
 

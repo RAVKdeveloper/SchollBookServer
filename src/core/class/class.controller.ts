@@ -3,7 +3,10 @@ import { Controller, Get, Param, Query, UseGuards, UseInterceptors } from '@nest
 import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 
 import { AuthGuard } from 'src/guards/auth.guard'
+import { CheckRoleGuard } from 'src/guards/check-role.guard'
+
 import { ClassService } from './class.service'
+
 import { Class } from './entities/class.entity'
 
 @ApiTags('Class')
@@ -21,6 +24,7 @@ export class ClassController {
   }
 
   @ApiOkResponse({ description: 'All classes for school', isArray: true, type: Class })
+  @UseGuards(CheckRoleGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.classService.findOne(+id)

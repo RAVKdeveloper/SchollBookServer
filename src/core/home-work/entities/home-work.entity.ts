@@ -18,23 +18,23 @@ export class HomeWork extends BasicEntity {
   @Column()
   description: string
 
-  @ApiProperty({ description: 'Lesson', enum: () => Lesson })
+  @ApiProperty({ description: 'Lesson', type: () => Lesson })
   @ManyToOne(() => Lesson)
   @JoinColumn({ name: 'lesson' })
   lesson: Lesson
 
-  @ApiProperty({ description: 'Day schedule', enum: () => DaySchedule })
+  @ApiProperty({ description: 'Day schedule', type: () => DaySchedule })
   @ManyToOne(() => DaySchedule)
   @JoinColumn({ name: 'day_schedule' })
   daySchedule: DaySchedule
 
-  @ApiProperty({ description: 'Creator', enum: () => User })
+  @ApiProperty({ description: 'Creator', type: () => User })
   @ManyToOne(() => User)
   @JoinColumn({ name: 'creator' })
   creator: User
 
+  @ApiProperty({ description: 'Class', type: () => Class })
   @ManyToOne(() => Class, classe => classe.homeWorks)
-  @ApiProperty({ description: 'Class', enum: () => Class })
   @JoinColumn({ name: 'class' })
   classe: Class
 }

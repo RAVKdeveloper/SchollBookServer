@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { Student } from '../accounts/student/entities/student.entity'
+import { Student } from '../accounts/accounts/entities/student.entity'
 import { Teacher } from '../accounts/teacher/entities/teacher.entity'
 import { ClassSchedule } from '../class-schedule/entities/class-schedule.entity'
 import { HomeWork } from '../home-work/entities/home-work.entity'

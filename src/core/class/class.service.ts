@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Cache } from 'cache-manager'
 import { Repository } from 'typeorm'
 
-import { Student } from '../accounts/student/entities/student.entity'
+import { Student } from '../accounts/accounts/entities/student.entity'
 import { Teacher } from '../accounts/teacher/entities/teacher.entity'
 import { Lesson } from '../lessons/entities/lesson.entity'
 import { MailService } from '../mail/mail.service'

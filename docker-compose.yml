@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.1'
 
 services:
   schoolbook:
@@ -15,9 +15,11 @@ services:
     depends_on:
       - redis
       - postgres
+      - clickhouse
     links:
       - redis
       - postgres
+      - clickhouse
   redis:
     image: redis
     ports:
@@ -40,7 +42,24 @@ services:
       - '5432:5432'
     volumes:
       - /var/lib/postgresql/data:/var/lib/postgresql/data
+  clickhouse:
+    image: yandex/clickhouse-server
+    ports:
+      - '8133:8123'
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse/data
+    restart: always
+    command:
+      clickhouse-client --host localhost --port 9000 --user default --password '' --query 'CREATE TABLE logs (
+      timestamp DateTime,
+      level String,
+      message String,
+      data String
+      ) ENGINE = MergeTree() ORDER BY timestamp;
+      '
 volumes:
   redis:
+    driver: local
+  clickhouse-data:
     driver: local
   docker-nest-postgres:

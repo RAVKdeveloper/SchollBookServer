@@ -1,15 +1,16 @@
-import { Entity, Column, JoinColumn, ManyToOne, ManyToMany, OneToMany } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from 'typeorm'
 
-import { School } from 'src/core/school/entities/school.entity'
-import { Class } from 'src/core/class/entities/class.entity'
-import { User } from 'src/core/user/entities/user.entity'
-import { Point } from 'src/core/point-system/entities/point-system.entity'
 import { BasicEntity } from 'src/basic/basic.entity'
+import { Class } from 'src/core/class/entities/class.entity'
+import { Point } from 'src/core/point-system/entities/point-system.entity'
+import { School } from 'src/core/school/entities/school.entity'
+import { User } from 'src/core/user/entities/user.entity'
+import { Parent } from './parent.entity'
 
 @Entity('student_account')
 export class Student extends BasicEntity {
-  @ApiProperty({ example: '1', description: 'Reference to user id' })
+  @ApiProperty({ description: 'Reference to user id', type: () => User })
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   userId: User
@@ -18,18 +19,18 @@ export class Student extends BasicEntity {
   @Column({ default: false, nullable: false })
   isAdmit: boolean
 
-  @ApiProperty({ example: '62', description: 'School id', enum: () => School })
+  @ApiProperty({ description: 'School id', type: () => School })
   @ManyToOne(() => School, school => school.students)
   @JoinColumn({ name: 'school_id' })
   school: School
 
   @ManyToMany(() => Class, classe => classe.students)
-  @ApiProperty({ default: [], description: 'Class student', enum: () => Class })
+  @ApiProperty({ description: 'Class student', type: () => Class, isArray: true })
   @JoinColumn({ name: 'class' })
   class: Class[]
 
+  @ApiProperty({ description: 'Points student', type: () => Point, isArray: true })
   @OneToMany(() => Point, point => point.student)
-  @ApiProperty({ description: 'Points student', enum: () => Point })
   points: Point[]
 
   @ApiProperty({
@@ -38,4 +39,9 @@ export class Student extends BasicEntity {
   })
   @Column({ nullable: true, name: 'date_of_accession' })
   dateOfAccession: Date
+
+  @ApiProperty({ description: 'Parents', type: () => Parent })
+  @ManyToOne(() => Parent, parent => parent.childrens, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'parents' })
+  readonly parents: Parent
 }

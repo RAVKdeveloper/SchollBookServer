@@ -11,7 +11,8 @@ import { redisStore } from 'cache-manager-redis-yet'
 import configuration from 'src/config/configuration'
 import { typeOrmConfig } from 'src/config/typeorm.config'
 
-import { StudentModule } from './core/accounts/student/student.module'
+import { ClickhousModule } from './clickhous/clickhous.module'
+import { AccountsModule } from './core/accounts/accounts/accounts.module'
 import { TeacherModule } from './core/accounts/teacher/teacher.module'
 import { AuthModule } from './core/auth/auth.module'
 import { ClassScheduleModule } from './core/class-schedule/class-schedule.module'
@@ -72,7 +73,7 @@ import { UserModule } from './core/user/user.module'
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
-    StudentModule,
+    AccountsModule,
     TeacherModule,
     SchoolModule,
     LessonsModule,
@@ -82,6 +83,7 @@ import { UserModule } from './core/user/user.module'
     SheduleActionsModule,
     HomeWorkModule,
     OrganizationsModule,
+    ClickhousModule,
   ],
   controllers: [],
   providers: [JwtGenService, MailService],
