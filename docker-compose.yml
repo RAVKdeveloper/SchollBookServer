@@ -49,14 +49,6 @@ services:
     volumes:
       - clickhouse-data:/var/lib/clickhouse/data
     restart: always
-    command:
-      clickhouse-client --host localhost --port 9000 --user default --password '' --query 'CREATE TABLE logs (
-      timestamp DateTime,
-      level String,
-      message String,
-      data String
-      ) ENGINE = MergeTree() ORDER BY timestamp;
-      '
 volumes:
   redis:
     driver: local
